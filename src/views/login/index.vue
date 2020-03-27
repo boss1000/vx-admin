@@ -3,35 +3,35 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">公共服务平台</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="accountNo">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
+          ref="accountNo"
+          v-model="loginForm.accountNo"
+          placeholder="请输入用户名"
+          name="accountNo"
           type="text"
           tabindex="1"
           auto-complete="on"
         />
       </el-form-item>
 
-      <el-form-item prop="password">
+      <el-form-item prop="accountPwdFirst">
         <span class="svg-container">
           <svg-icon icon-class="password" />
         </span>
         <el-input
           :key="passwordType"
           ref="password"
-          v-model="loginForm.password"
+          v-model="loginForm.accountPwdFirst"
           :type="passwordType"
-          placeholder="Password"
-          name="password"
+          placeholder="请输入密码"
+          name="accountPwdFirst"
           tabindex="2"
           auto-complete="on"
           @keyup.enter.native="handleLogin"
@@ -43,43 +43,31 @@
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div>
-
     </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-
+import md5 from 'js-md5'
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('请输入密码'))
       } else {
         callback()
       }
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        accountNo: '',
+        accountPwdFirst: '',
+        accountPwd: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        accountNo: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
+        accountPwdFirst: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
       passwordType: 'password',
@@ -93,6 +81,8 @@ export default {
       },
       immediate: true
     }
+  },
+  mounted() {
   },
   methods: {
     showPwd() {
@@ -109,14 +99,14 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
+          this.loginForm.accountPwd = md5(this.loginForm.accountPwdFirst)
           this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+            this.$router.push(`/redirect`)
             this.loading = false
           }).catch(() => {
             this.loading = false
           })
         } else {
-          console.log('error submit!!')
           return false
         }
       })
