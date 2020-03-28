@@ -10,13 +10,13 @@ const tokens = {
 
 const users = {
   'admin-token': {
-    roles: ['admin'],
+    roles: ['maximum'],
     introduction: 'I am a super administrator',
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
     name: 'Super Admin'
   },
   'editor-token': {
-    roles: ['editor'],
+    roles: ['second'],
     introduction: 'I am an editor',
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
     name: 'Normal Editor'
@@ -26,7 +26,7 @@ const users = {
 export default [
   // user login
   {
-    url: '/user/login',
+    url: '/vue-element-admin/user/login',
     type: 'post',
     response: config => {
       const { username } = config.body
@@ -49,7 +49,7 @@ export default [
 
   // get user info
   {
-    url: '/user/info\.*',
+    url: '/vue-element-admin/user/info\.*',
     type: 'get',
     response: config => {
       const { token } = config.query
@@ -72,7 +72,7 @@ export default [
 
   // user logout
   {
-    url: '/user/logout',
+    url: '/vue-element-admin/user/logout',
     type: 'post',
     response: _ => {
       return {

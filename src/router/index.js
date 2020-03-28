@@ -20,6 +20,8 @@ import Layout from '@/layout'
     roles: ['admin','editor']    control the page roles (you can set multiple roles)
     title: 'title'               the name show in sidebar and breadcrumb (recommend set)
     icon: 'svg-name'             the icon show in the sidebar
+    noCache: true                if set true, the page will no be cached(default is false)
+    affix: true                  if set true, the tag will affix in the tags-view
     breadcrumb: false            if set false, the item will hidden in breadcrumb(default is true)
     activeMenu: '/example/list'  if set path, the sidebar will highlight the path you set
   }
@@ -37,115 +39,134 @@ export const constantRoutes = [
     hidden: true,
     children: [
       {
-        path: '/redirect/:path*',
+        path: '/redirect/:path(.*)',
         component: () => import('@/views/redirect/index')
       }
     ]
   },
   {
     path: '/login',
-    name: 'login',
     component: () => import('@/views/login/index'),
     hidden: true
   },
   {
-    path: '/404',
-    component: () => import('@/views/404'),
+    path: '/auth-redirect',
+    component: () => import('@/views/login/auth-redirect'),
     hidden: true
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/error-page/404'),
+    hidden: true
+  },
+  {
+    path: '/401',
+    component: () => import('@/views/error-page/401'),
+    hidden: true
+  },
+  {
+    path: '/',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [
+      {
+        path: 'dashboard',
+        component: () => import('@/views/dashboard/index'),
+        name: 'Dashboard',
+        meta: { title: '首页', affix: true }
+      }
+    ]
   }
 ]
 
-export const asyncRoutesUser = [{
-  path: '/',
-  component: Layout,
-  redirect: '/jurisdiction', // 需要按照权限跳转
-  meta: {
-    title: '核心服务',
-    icon: 'dashboard'
-  },
-  children: [{
-    path: 'jurisdiction',
-    name: 'jurisdiction',
-    component: () => import('@/views/jurisdiction/index'), // 权限管理
-    level: "maximum", // 超级管理员权限
-    meta: {
-      title: '权限配置',
-      noCache: false
-    }
-  },
+/**
+ * asyncRoutes
+ * the routes that need to be dynamically loaded based on user roles
+ */
+export const asyncRoutes = [
   {
-    path: 'noticemanage',
-    name: 'noticemanage',
-    component: () => import('@/views/noticemanage/index'), // 消息公告
-    level: "maximum",
+    path: '/main',
+    component: Layout,
+    // redirect: '/main/jurisdiction',
+    alwaysShow: true, // will always show the root menu
+    name: 'main',
     meta: {
-      title: '消息公告',
-      noCache: false
-    }
+      title: '核心服务',
+      roles: ['maximum', 'second', 'three'] // you can set roles in root nav
+    },
+    children: [
+      {
+        path: 'jurisdiction',
+        component: () => import('@/views/jurisdiction'),
+        name: 'JurisDiction',
+        meta: {
+          title: '权限配置',
+          roles: ['maximum']
+        }
+      },
+      {
+        path: 'noticemanage',
+        component: () => import('@/views/noticemanage'),
+        name: 'NoticeManage',
+        meta: {
+          title: '消息公告',
+          roles: ['maximum']
+        }
+      },
+      {
+        path: 'studentmanage',
+        name: 'studentmanage',
+        component: () => import('@/views/studentmanage/index'), // 学生管理
+        meta: {
+          title: '学生管理',
+          roles: ['second'] // 总负责人
+        }
+      },
+      {
+        path: 'approvalmanage',
+        name: 'approvalmanage',
+        component: () => import('@/views/approvalmanage/index'), // 审批管理
+        meta: {
+          title: '审批管理',
+          roles: ['second'] // 总负责人
+        }
+      },
+      {
+        path: 'statexhibition',
+        name: 'statexhibition',
+        component: () => import('@/views/statexhibition/index'), // 状态展示
+        meta: {
+          title: '状态展示',
+          roles: ['second'] // 总负责人
+        }
+      },
+      {
+        path: 'approvaler',
+        name: 'approvaler',
+        component: () => import('@/views/approvaler/index'), // 审批管理
+        meta: {
+          title: '审批管理',
+          roles: ['three'] // 审批人员
+        }
+      },
+      {
+        path: 'stateshow',
+        name: 'stateshow',
+        component: () => import('@/views/stateshow/index'), // 状态展示
+        meta: {
+          title: '状态展示',
+          roles: ['three'] // 审批人员
+        }
+      }
+    ]
   },
-  {
-    path: 'studentmanage',
-    name: 'studentmanage',
-    component: () => import('@/views/studentmanage/index'), // 学生管理
-    level: "second", // 总负责人
-    meta: {
-      title: '学生管理',
-      noCache: false
-    }
-  },
-  {
-    path: 'approvalmanage',
-    name: 'approvalmanage',
-    component: () => import('@/views/approvalmanage/index'), // 审批管理
-    level: "second", // 总负责人
-    meta: {
-      title: '审批管理',
-      noCache: false
-    }
-  },
-  {
-    path: 'statexhibition',
-    name: 'statexhibition',
-    component: () => import('@/views/statexhibition/index'), // 状态展示
-    level: "second", // 总负责人
-    meta: {
-      title: '状态展示',
-      noCache: false
-    }
-  },
-  {
-    path: 'approvaler',
-    name: 'approvaler',
-    component: () => import('@/views/approvaler/index'), // 审批管理
-    level: "three", // 审批人员
-    meta: {
-      title: '审批管理',
-      noCache: false
-    }
-  },
-  {
-    path: 'stateshow',
-    name: 'stateshow',
-    component: () => import('@/views/stateshow/index'), // 状态展示
-    level: "three", // 审批人员
-    meta: {
-      title: '状态展示',
-      noCache: false
-    }
-  }]
-},
-// 404 page must be placed at the end !!!
-{
-  path: '*',
-  redirect: '/404',
-  hidden: true
-}]
+  // 404 page must be placed at the end !!!
+  { path: '*', redirect: '/404', hidden: true }
+]
 
 const createRouter = () => new Router({
   // mode: 'history', // require service support
-  scrollBehavior: () => ({
-    y: 0
-  }),
+  scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })
 

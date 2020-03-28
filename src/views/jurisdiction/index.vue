@@ -1,25 +1,15 @@
 <template>
-  <div class="commonTemp">
-    123
+  <div>
+    <el-input v-model="formInline" placeholder="权限配置" />
   </div>
 </template>
 <script>
 export default {
-  name: 'Jurisdiction',
+  name: "JurisDiction",
   data() {
     return {
+      formInline: ""
     };
-  },
-  mounted() {
-    console.log(344)
   }
 };
 </script>
-<style lang="scss" scoped>
-.tagclose {
-  /deep/ .el-tag__close.el-icon-close {
-    display: none;
-    position: absolute;
-  }
-}
-</style>
