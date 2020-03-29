@@ -4,6 +4,7 @@
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
         :default-active="activeMenu"
+        :default-opened="defaultopened"
         :collapse="isCollapse"
         :background-color="variables.menuBg"
         :text-color="variables.menuText"
@@ -26,6 +27,11 @@ import variables from '@/styles/variables.scss'
 
 export default {
   components: { SidebarItem, Logo },
+  data() {
+    return {
+      defaultopened: ['2']
+    }
+  },
   computed: {
     ...mapGetters([
       'permission_routes',

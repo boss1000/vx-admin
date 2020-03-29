@@ -39,10 +39,14 @@ export default {
   .app-main {
     /* 84 = navbar + tags-view = 50 + 34 */
     min-height: calc(100vh - 84px);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
 
   .fixed-header+.app-main {
     padding-top: 84px;
+    background-color: #eee;
   }
 }
 </style>

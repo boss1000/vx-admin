@@ -26,6 +26,7 @@ module.exports = {
     "vue/name-property-casing": ["error", "PascalCase"],
     "vue/no-v-html": "off",
     "vue/html-self-closing": 0,
+    "vue/attribute-hyphenation": 0,
     'accessor-pairs': 2,
     'arrow-spacing': [2, {
       'before': true,
@@ -54,9 +55,7 @@ module.exports = {
       'after': true
     }],
     'handle-callback-err': [2, '^(err|error)$'],
-    'indent': [2, 2, {
-      'SwitchCase': 1
-    }],
+    'indent': 0,
     'jsx-quotes': [2, 'prefer-single'],
     'key-spacing': [2, {
       'beforeColon': false,
@@ -70,6 +69,7 @@ module.exports = {
       'newIsCap': true,
       'capIsNew': false
     }],
+    "no-tabs":"off",
     'new-parens': 2,
     'no-array-constructor': 2,
     'no-caller': 2,

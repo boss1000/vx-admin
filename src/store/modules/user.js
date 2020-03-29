@@ -7,7 +7,29 @@ const state = {
   name: '',
   avatar: '',
   introduction: '',
-  roles: []
+  roles: [],
+  approver: [{
+		label: '图书管',
+		value: '1'
+	}, {
+		label: '财务处',
+		value: '2'
+	}, {
+		label: '党委',
+		value: '3'
+	}, {
+		label: '团委',
+		value: '4'
+	}, {
+		label: '二级学院',
+		value: '5'
+	}, {
+		label: '舍管处',
+		value: '6'
+	}, {
+		label: '宿舍',
+		value: '7'
+	}]
 }
 
 const mutations = {
