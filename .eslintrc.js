@@ -27,6 +27,9 @@ module.exports = {
     "vue/no-v-html": "off",
     "vue/html-self-closing": 0,
     "vue/attribute-hyphenation": 0,
+    "vue/require-prop-type-constructor": 0,
+    "vue/require-default-prop": 0,
+    "vue/order-in-components": 0,
     'accessor-pairs': 2,
     'arrow-spacing': [2, {
       'before': true,
@@ -138,9 +141,7 @@ module.exports = {
     'no-undef-init': 2,
     'no-unexpected-multiline': 2,
     'no-unmodified-loop-condition': 2,
-    'no-unneeded-ternary': [2, {
-      'defaultAssignment': false
-    }],
+    'no-unneeded-ternary': 0,
     'no-unreachable': 2,
     'no-unsafe-finally': 2,
     'no-unused-vars': [2, {
@@ -183,7 +184,7 @@ module.exports = {
     'wrap-iife': [2, 'any'],
     'yield-star-spacing': [2, 'both'],
     'yoda': [2, 'never'],
-    'prefer-const': 2,
+    'prefer-const': 0,
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
     'object-curly-spacing': [2, 'always', {
       objectsInObjects: false

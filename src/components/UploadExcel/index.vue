@@ -1,138 +1,75 @@
 <template>
-  <div>
-    <input ref="excel-upload-input" class="excel-upload-input" type="file" accept=".xlsx, .xls" @change="handleClick">
-    <div class="drop" @drop="handleDrop" @dragover="handleDragover" @dragenter="handleDragover">
-      Drop excel file here or
-      <el-button :loading="loading" style="margin-left:16px;" size="mini" type="primary" @click="handleUpload">
-        Browse
-      </el-button>
-    </div>
-  </div>
+  <span>
+    <input
+      class="input-file"
+      type="file"
+      accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+      @change="exportData"
+    />
+    <el-button size="small" @click="btnClick">{{ title }}</el-button>
+  </span>
 </template>
 
 <script>
-import XLSX from 'xlsx'
+import XLSX from "xlsx";
 
 export default {
-  props: {
-    beforeUpload: Function, // eslint-disable-line
-    onSuccess: Function// eslint-disable-line
-  },
+  name: "InputExcel",
   data() {
-    return {
-      loading: false,
-      excelData: {
-        header: null,
-        results: null
-      }
+    return {};
+  },
+  props: {
+    title: {
+      type: String,
+      default: "导入表格"
     }
   },
   methods: {
-    generateData({ header, results }) {
-      this.excelData.header = header
-      this.excelData.results = results
-      this.onSuccess && this.onSuccess(this.excelData)
+    btnClick() {
+      document.querySelector(".input-file").click();
     },
-    handleDrop(e) {
-      e.stopPropagation()
-      e.preventDefault()
-      if (this.loading) return
-      const files = e.dataTransfer.files
-      if (files.length !== 1) {
-        this.$message.error('Only support uploading one file!')
-        return
+    exportData(event) {
+      if (!event.currentTarget.files.length) {
+        return;
       }
-      const rawFile = files[0] // only use files[0]
-
-      if (!this.isExcel(rawFile)) {
-        this.$message.error('Only supports upload .xlsx, .xls, .csv suffix files')
-        return false
-      }
-      this.upload(rawFile)
-      e.stopPropagation()
-      e.preventDefault()
-    },
-    handleDragover(e) {
-      e.stopPropagation()
-      e.preventDefault()
-      e.dataTransfer.dropEffect = 'copy'
-    },
-    handleUpload() {
-      this.$refs['excel-upload-input'].click()
-    },
-    handleClick(e) {
-      const files = e.target.files
-      const rawFile = files[0] // only use files[0]
-      if (!rawFile) return
-      this.upload(rawFile)
-    },
-    upload(rawFile) {
-      this.$refs['excel-upload-input'].value = null // fix can't select the same excel
-
-      if (!this.beforeUpload) {
-        this.readerData(rawFile)
-        return
-      }
-      const before = this.beforeUpload(rawFile)
-      if (before) {
-        this.readerData(rawFile)
-      }
-    },
-    readerData(rawFile) {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = e => {
-          const data = e.target.result
-          const workbook = XLSX.read(data, { type: 'array' })
-          const firstSheetName = workbook.SheetNames[0]
-          const worksheet = workbook.Sheets[firstSheetName]
-          const header = this.getHeaderRow(worksheet)
-          const results = XLSX.utils.sheet_to_json(worksheet)
-          this.generateData({ header, results })
-          this.loading = false
-          resolve()
-        }
-        reader.readAsArrayBuffer(rawFile)
-      })
-    },
-    getHeaderRow(sheet) {
-      const headers = []
-      const range = XLSX.utils.decode_range(sheet['!ref'])
-      let C
-      const R = range.s.r
-      /* start in the first row */
-      for (C = range.s.c; C <= range.e.c; ++C) { /* walk every column in the range */
-        const cell = sheet[XLSX.utils.encode_cell({ c: C, r: R })]
-        /* find the cell in the first row */
-        let hdr = 'UNKNOWN ' + C // <-- replace with your desired default
-        if (cell && cell.t) hdr = XLSX.utils.format_cell(cell)
-        headers.push(hdr)
-      }
-      return headers
-    },
-    isExcel(file) {
-      return /\.(xlsx|xls|csv)$/.test(file.name)
+      const that = this;
+      // 拿取文件对象
+      let f = event.currentTarget.files[0];
+      // 这里已经拿到了excel的file文件，若是项目需求，可直接$emit丢出文件
+      that.$emit("getMyExcelData", f);
+      // 用FileReader来读取
+      let reader = new FileReader();
+      // 重写FileReader上的readAsBinaryString方法
+      FileReader.prototype.readAsBinaryString = function(f) {
+        let binary = "";
+        let wb; // 读取完成的数据
+        let outdata; // 你需要的数据
+        let reader = new FileReader();
+        reader.onload = function(e) {
+          // 读取成Uint8Array，再转换为Unicode编码（Unicode占两个字节）
+          let bytes = new Uint8Array(reader.result);
+          let length = bytes.byteLength;
+          for (let i = 0; i < length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          // 接下来就是xlsx
+          wb = XLSX.read(binary, {
+            type: "binary"
+          });
+          outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+          // 导出格式为json，{表头：[]，表数据：[]}
+          that.$emit("getResult", outdata);
+        };
+        reader.readAsArrayBuffer(f);
+      };
+      reader.readAsBinaryString(f);
     }
   }
-}
+};
 </script>
 
 <style scoped>
-.excel-upload-input{
+.input-file {
   display: none;
-  z-index: -9999;
-}
-.drop{
-  border: 2px dashed #bbb;
-  width: 600px;
-  height: 160px;
-  line-height: 160px;
-  margin: 0 auto;
-  font-size: 24px;
-  border-radius: 5px;
-  text-align: center;
-  color: #bbb;
-  position: relative;
 }
 </style>

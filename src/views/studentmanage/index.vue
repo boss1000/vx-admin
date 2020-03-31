@@ -5,7 +5,8 @@
         <el-button type="primary" size="small" @click="searchData">查询</el-button>
         <el-button plain size="small" @click="restData">重置</el-button>
         <el-button plain size="small" @click="deleteData">分配</el-button>
-        <el-button plain size="small" @click="postExcal">上传</el-button>
+        <input-excel title="上传学生" @getResult="postExcal"></input-excel>
+        <el-button plain size="small" @click="approvalAll">审批</el-button>
       </div>
     </div>
     <div class="searchForm">
@@ -13,64 +14,42 @@
         <el-row>
           <el-col :span="6">
             <el-form-item label="姓名">
-              <el-input v-model="searchForm.name" placeholder="请输入姓名"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="权限">
-              <el-select v-model="searchForm.jurisdiction" placeholder="请选择权限">
-                <el-option
-                  v-for="item in groupList.jurisdictionList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="部门">
-              <el-select v-model="searchForm.department" placeholder="请选择权限部门">
-                <el-option
-                  v-for="item in approverList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
+              <el-input v-model="searchForm.name" placeholder="请输入姓名或者学号"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
     </div>
     <div class="content">
-      <el-table
-        :data="tableData"
-        height="100%"
-        size="mini"
-        stripe
-        border
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column type="selection" align="center" width="55"></el-table-column>
-        <el-table-column type="index" align="center" width="50" label="序号"></el-table-column>
-        <template v-for="item in tableName">
-          <el-table-column
-            :key="item.userId"
-            :prop="item.prop"
-            :label="item.label"
-            align="center"
-            show-overflow-tooltip
-          ></el-table-column>
-        </template>
-        <el-table-column fixed="right" align="center" label="操作">
-          <template slot-scope="scope">
-            <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+      <div class="tableBox">
+        <el-table
+          :data="tableData"
+          height="100%"
+          size="mini"
+          stripe
+          border
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column type="selection" align="center" width="55"></el-table-column>
+          <el-table-column type="index" align="center" width="50" label="序号"></el-table-column>
+          <template v-for="item in tableName">
+            <el-table-column
+              :key="item.userId"
+              :prop="item.prop"
+              :label="item.label"
+              align="center"
+              show-overflow-tooltip
+            ></el-table-column>
           </template>
-        </el-table-column>
-      </el-table>
+          <el-table-column fixed="right" align="center" label="操作">
+            <template slot-scope="scope">
+              <el-button size="mini" @click="approvalOne(scope.row)">审批</el-button>
+              <el-button size="mini" @click="openMessage(scope.row)">留言</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
     </div>
     <div class="footer">
       <el-pagination
@@ -83,12 +62,8 @@
         @current-change="handleCurrentChange"
       ></el-pagination>
     </div>
-    <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
-      <JurisDictionDetail
-        :jurisdictionList="groupList.jurisdictionList"
-        :approverList="approverList"
-        :dialogData="dialogData"
-      ></JurisDictionDetail>
+    <el-dialog title="留言" :visible.sync="dialogFormVisible">
+      <studentDetail :dialogData="dialogData"></studentDetail>
       <div slot="footer" class="dialog-footer" style="text-align:center">
         <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -97,11 +72,13 @@
   </div>
 </template>
 <script>
-import JurisDictionDetail from "./detail";
+import studentDetail from "./detail";
+import inputExcel from "../../components/UploadExcel";
 export default {
   name: "StudentManage",
   components: {
-    JurisDictionDetail
+    studentDetail,
+    inputExcel
   },
   data() {
     return {
@@ -140,93 +117,10 @@ export default {
         jurisdiction: "",
         department: ""
       },
-      groupList: {
-        jurisdictionList: [
-          {
-            label: "总负责人",
-            value: "1"
-          },
-          {
-            label: "审批人员",
-            value: "2"
-          }
-        ]
-      },
-      tableData: [
-        {
-          userId: "2016-05-03",
-          password: "1234121",
-          userType: "上海",
-          userName: "vvvcczx",
-          userDept: "1",
-          userDuty: "2",
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "1232",
-          password: "1234121",
-          userType: "上海",
-          userName: "ssss",
-          userDept: "2",
-          userDuty: "1",
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "544",
-          password: "1234121",
-          userType: "上海",
-          userName: "ggg",
-          userDept: "上海市普陀区金沙江路 1518 弄",
-          userDuty: 200333,
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "2016-023",
-          password: "1234121",
-          userType: "上海",
-          userName: "普陀区",
-          userDept: "上海市普陀区金沙江路 1518 弄",
-          userDuty: 200333,
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "20143",
-          password: "1234121",
-          userType: "上海",
-          userName: "普陀区",
-          userDept: "上海市普陀区金沙江路 1518 弄",
-          userDuty: 200333,
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "2015-03",
-          password: "1234121",
-          userType: "上海",
-          userName: "普陀区",
-          userDept: "上海市普陀区金沙江路 1518 弄",
-          userDuty: 200333,
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "2016-05-03",
-          password: "1234121",
-          userType: "上海",
-          userName: "普陀区",
-          userDept: "上海市普陀区金沙江路 1518 弄",
-          userDuty: 200333,
-          email: "32112",
-          userImage: "322111"
-        }
-      ],
+      tableData: [],
       page: {
         sizes: 20,
-        total: 100,
+        total: 0,
         currentPage: 1
       },
       dialogFormVisible: false,
@@ -241,9 +135,55 @@ export default {
   },
   methods: {
     searchData() {},
-    handleEdit(index, data) {
-      this.dialogFormVisible = true;
+    openMessage(data) {
       this.dialogData = data;
+      this.$nextTick(() => {
+        this.dialogFormVisible = true;
+      });
+    },
+    approvalAll() {
+      if (this.selectTable.length > 0) {
+        // this.dialogFormVisible = true;
+        // this.dialogData = data ? data : {};
+        this.$confirm("是否进行审批?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            this.$message({
+              type: "success",
+              message: "审批成功!"
+            });
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消审批"
+            });
+          });
+      } else {
+        this.$message.warning("请选择审批项");
+      }
+    },
+    approvalOne(data) {
+      this.$confirm("是否进行审批?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "审批成功!"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消审批"
+          });
+        });
     },
     handleDelete() {
       this.$confirm("是否删除该账号?", "提示", {
@@ -280,7 +220,11 @@ export default {
         this.$options.data().searchForm
       );
     },
-    deleteData() {}
+    deleteData() {},
+    postExcal(data) {
+      this.tableData = data;
+      this.page.total = data.length;
+    }
   }
 };
 </script>
