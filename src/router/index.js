@@ -115,7 +115,7 @@ export const asyncRoutes = [
       },
       {
         path: 'studentmanage',
-        name: 'studentmanage',
+        name: 'StudentManage',
         component: () => import('@/views/studentmanage/index'), // 学生管理
         meta: {
           title: '学生管理',
