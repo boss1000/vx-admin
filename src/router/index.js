@@ -73,7 +73,7 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
-        meta: { title: '首页', affix: true }
+        meta: { title: '首页', icon: 'dashboard', affix: true }
       }
     ]
   }
@@ -92,6 +92,7 @@ export const asyncRoutes = [
     name: 'main',
     meta: {
       title: '核心服务',
+      icon: 'user',
       roles: ['maximum', 'second', 'three'] // you can set roles in root nav
     },
     children: [
@@ -124,16 +125,16 @@ export const asyncRoutes = [
       },
       {
         path: 'approvalmanage',
-        name: 'approvalmanage',
-        component: () => import('@/views/approvalmanage/index'), // 审批管理
+        name: 'ApprovalManage',
+        component: () => import('@/views/approvalmanage/index'), // 公告管理
         meta: {
-          title: '审批管理',
+          title: '公告管理',
           roles: ['second'] // 总负责人
         }
       },
       {
         path: 'statexhibition',
-        name: 'statexhibition',
+        name: 'StateXhibition',
         component: () => import('@/views/statexhibition/index'), // 状态展示
         meta: {
           title: '状态展示',
@@ -142,10 +143,10 @@ export const asyncRoutes = [
       },
       {
         path: 'approvaler',
-        name: 'approvaler',
+        name: 'Approvaler',
         component: () => import('@/views/approvaler/index'), // 审批管理
         meta: {
-          title: '审批管理',
+          title: '学生管理',
           roles: ['three'] // 审批人员
         }
       },

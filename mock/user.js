@@ -5,6 +5,9 @@ const tokens = {
   },
   editor: {
     token: 'editor-token'
+  },
+  student: {
+    token: 'student-token'
   }
 }
 
@@ -17,6 +20,12 @@ const users = {
   },
   'editor-token': {
     roles: ['second'],
+    introduction: 'I am an editor',
+    avatar: 'https://wpimg.wFallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+    name: 'Normal Editor'
+  },
+  'student-token': {
+    roles: ['three'],
     introduction: 'I am an editor',
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
     name: 'Normal Editor'
