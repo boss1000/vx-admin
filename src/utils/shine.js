@@ -1,4 +1,5 @@
-(function (root, factory) {if (typeof define === 'function' && define.amd) {
+(function(root, factory) {
+ if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(['exports', 'echarts'], factory);
     } else if (typeof exports === 'object' && typeof exports.nodeName !== 'string') {
@@ -8,8 +9,8 @@
         // Browser globals
         factory({}, root.echarts);
     }
-}(this, function (exports, echarts) {
-    var log = function (msg) {
+}(this, function(exports, echarts) {
+    var log = function(msg) {
         if (typeof console !== 'undefined') {
             console && console.error && console.error(msg);
         }
@@ -20,8 +21,8 @@
     }
 
     var colorPalette = [
-        '#c12e34','#e6b600','#0098d9','#2b821d',
-        '#005eaa','#339ca8','#cda819','#32a487'
+        '#c12e34', '#e6b600', '#0098d9', '#2b821d',
+        '#005eaa', '#339ca8', '#cda819', '#32a487'
     ];
 
     var theme = {
@@ -35,7 +36,7 @@
         },
 
         visualMap: {
-            color:['#1790cf','#a2d4e6']
+            color: ['#1790cf', '#a2d4e6']
         },
 
         toolbox: {
@@ -114,13 +115,13 @@
             axisLine: {
                 show: true,
                 lineStyle: {
-                    color: [[0.2, '#2b821d'],[0.8, '#005eaa'],[1, '#c12e34']],
+                    color: [[0.2, '#2b821d'], [0.8, '#005eaa'], [1, '#c12e34']],
                     width: 5
                 }
             },
             axisTick: {
                 splitNumber: 10,
-                length:8,
+                length: 8,
                 lineStyle: {
                     color: 'auto'
                 }
