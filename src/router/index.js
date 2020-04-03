@@ -101,7 +101,7 @@ export const asyncRoutes = [
         component: () => import('@/views/jurisdiction'),
         name: 'JurisDiction',
         meta: {
-          title: '权限配置',
+          title: '用户管理',
           roles: ['maximum']
         }
       },
@@ -110,7 +110,7 @@ export const asyncRoutes = [
         component: () => import('@/views/noticemanage'),
         name: 'NoticeManage',
         meta: {
-          title: '消息公告',
+          title: '公告管理',
           roles: ['maximum']
         }
       },

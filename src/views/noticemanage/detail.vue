@@ -1,22 +1,41 @@
 <template>
   <div class="commonTemp">
-    <el-form :inline="true" class="detailForm" :model="dialogForm" label-width="100px">
+    <el-form
+      ref="ruleForm"
+      :inline="true"
+      :model="dialogForm"
+      :rules="rules"
+      class="detailForm"
+      label-width="100px"
+    >
       <el-row>
         <el-col :span="12">
-          <el-form-item label="消息标题">
+          <el-form-item label="消息标题" prop="messageTitle">
             <el-input v-model="dialogForm.messageTitle" placeholder="请输入消息标题"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="接受者学号">
-            <el-input v-model="dialogForm.messageToUserId" placeholder="请输入接受者学号"></el-input>
+          <el-form-item label="管理部门" prop="messageToUserDept">
+            <el-select v-model="dialogForm.messageToUserDept" placeholder="请选择管理部门">
+              <el-option
+                v-for="item in approverList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="24">
-          <el-form-item label="消息内容">
-            <el-input v-model="dialogForm.messageBody" class="contentBox" type="textarea"></el-input>
+          <el-form-item label="消息内容" prop="messageBody">
+            <el-input
+              v-model="dialogForm.messageBody"
+              placeholder="请输入消息内容"
+              class="contentBox"
+              type="textarea"
+            ></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -34,14 +53,6 @@ export default {
     approverList: {
       type: Array,
       default: () => []
-    },
-    jurisdictionList: {
-      type: Array,
-      default: () => []
-    },
-    dialogData: {
-      type: Object,
-      default: () => {}
     }
   },
   data() {
@@ -50,22 +61,42 @@ export default {
         messageTitle: "",
         messageToUserId: "",
         messageBody: ""
+      },
+      rules: {
+        messageTitle: [
+          { required: true, message: "请输入消息标题", trigger: "blur" }
+        ],
+        messageToUserDept: [
+          { required: true, message: "请选择管理部门", trigger: "change" }
+        ],
+        messageBody: [
+          { required: true, message: "请输入消息内容", trigger: "blur" }
+        ]
       }
     };
   },
   watch: {
-    dialogData: {
+    dialogFormVisible: {
       handler() {
-        let handlerData = {};
-        handlerData = JSON.parse(JSON.stringify(this.dialogData));
-        handlerData.password = "";
-        this.dialogForm = Object.assign({}, this.dialogForm, handlerData);
+        this.dialogForm = Object.assign({}, this.$data.dialogForm, this.$options.data().dialogForm);
       },
       deep: true,
       immediate: true
     }
   },
-  methods: {}
+  methods: {
+    submitForm() {
+      let state = "";
+      this.$refs.ruleForm.validate(valid => {
+        if (valid) {
+          state = true;
+        } else {
+          state = false;
+        }
+      });
+      return state;
+    }
+  }
 };
 </script>
 <style lang="scss" scope>

@@ -49,7 +49,10 @@ const mutations = {
 const actions = {
   generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
-      const accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+      console.log('roles', roles)
+      // 修改权限信息 0 超级管理员 1 总负责人 2 审批人员
+      let setTRole = (roles == '0') ? ['maximum'] : (roles == '1') ? ['second'] : ['three']
+      const accessedRoutes = filterAsyncRoutes(asyncRoutes, setTRole)
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })

@@ -1,24 +1,39 @@
 <template>
   <div class="commonTemp">
-    <el-form :inline="true" class="detailForm" :model="dialogForm" label-width="100px">
+    <el-form
+      ref="ruleForm"
+      :inline="true"
+      :model="dialogForm"
+      :rules="rules"
+      class="detailForm"
+      label-width="100px"
+    >
       <el-row>
         <el-col :span="12">
-          <el-form-item label="姓名">
+          <el-form-item v-if="state" label="账号">
+            <el-input v-model="dialogForm.account" placeholder="请输入账号"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="姓名" prop="userName">
             <el-input v-model="dialogForm.userName" placeholder="请输入姓名"></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <!-- <el-col :span="12">
           <el-form-item label="身份">
             <el-input v-model="dialogForm.userType" placeholder="请输入身份"></el-input>
           </el-form-item>
-        </el-col>
+        </el-col>-->
         <el-col :span="12">
-          <el-form-item label="密码">
+          <el-form-item v-if="state" label="密码" prop="password">
+            <el-input v-model="dialogForm.password" placeholder="请输入密码"></el-input>
+          </el-form-item>
+          <el-form-item v-else label="密码">
             <el-input v-model="dialogForm.password" placeholder="请输入密码"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="管理部门">
+          <el-form-item label="管理部门" prop="userDept">
             <el-select v-model="dialogForm.userDept" placeholder="请选择管理部门">
               <el-option
                 v-for="item in approverList"
@@ -30,8 +45,8 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="用户权限">
-            <el-select v-model="dialogForm.userDuty" placeholder="请选择权限">
+          <el-form-item label="用户权限" prop="userDuty">
+            <el-select v-model="dialogForm.userDuty" placeholder="请选择用户权限">
               <el-option
                 v-for="item in jurisdictionList"
                 :key="item.value"
@@ -42,13 +57,13 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="邮箱">
+          <el-form-item label="邮箱" prop="email">
             <el-input v-model="dialogForm.email" placeholder="请输入邮箱"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="头像">
-            <el-upload
+          <el-form-item label="头像" prop="userImage">
+            <!-- <el-upload
               class="avatar-uploader"
               action="这里填入后台的接口地址"
               :show-file-list="false"
@@ -65,8 +80,8 @@
                 <i class="el-icon-delete"></i>
               </span>
               <i v-else class="el-icon-upload2 avatar-uploader-icon" stop></i>
-            </el-upload>
-            <!-- <el-input v-model="dialogForm.userImage" placeholder="请输入头像url"></el-input> -->
+            </el-upload>-->
+            <el-input v-model="dialogForm.userImage" placeholder="请输入头像url"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -77,6 +92,10 @@
 export default {
   name: "JurisDictionDetail",
   props: {
+    title: {
+      type: String,
+      default: ""
+    },
     dialogFormVisible: {
       type: Boolean,
       default: false
@@ -96,10 +115,41 @@ export default {
   },
   data() {
     return {
-      dialogForm: {}
+      state: true,
+      rules: {
+        userName: [{ required: true, message: "请输入姓名", trigger: "blur" }],
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        userDept: [
+          { required: true, message: "请选择管理部门", trigger: "change" }
+        ],
+        userDuty: [
+          { required: true, message: "请选择用户权限", trigger: "change" }
+        ],
+        email: [{ required: true, message: "请输入邮箱", trigger: "blur" }],
+        userImage: [
+          { required: true, message: "请输入请输入头像url", trigger: "blur" }
+        ]
+      },
+      dialogForm: {
+        userImage: "",
+        userDept: "",
+        userDuty: "",
+        userName: "",
+        userId: "",
+        account: "",
+        email: "",
+        password: ""
+      }
     };
   },
   watch: {
+    title: {
+      handler() {
+        this.state = this.title == "新增" ? true : false;
+      },
+      deep: true,
+      immediate: true
+    },
     dialogData: {
       handler() {
         let handlerData = {};
@@ -135,6 +185,17 @@ export default {
         this.$message.error("上传图片大小不能超过 2MB!");
       }
       return type && isLt2M;
+    },
+    submitForm() {
+      let state = "";
+      this.$refs.ruleForm.validate(valid => {
+        if (valid) {
+          state = true;
+        } else {
+          state = false;
+        }
+      });
+      return state;
     }
   }
 };

@@ -34,14 +34,15 @@ router.beforeEach(async(to, from, next) => {
         try {
           // get user info
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-          const { roles } = await store.dispatch('user/getInfo')
+          // 获取请求登陆信息
+          const { userDuty } = await store.dispatch('user/getInfo')
 
-          // generate accessible routes map based on roles
-          const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+          // generate accessible routes map based on roles 获取具体权限
+          const accessRoutes = await store.dispatch('permission/generateRoutes', userDuty)
 
-          // dynamically add accessible routes
+          // dynamically add accessible routes 向路由添加请求的权限
           router.addRoutes(accessRoutes)
-          // hack method to ensure that addRoutes is complete
+          // hack method to ensure that addRoutes is complete 跳转页面
           // set the replace: true, so the navigation will not leave a history record
           next({ ...to, replace: true })
         } catch (error) {

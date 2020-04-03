@@ -1,9 +1,11 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
+import md5 from 'js-md5'
 
 const state = {
   token: getToken(),
+  account: '',
   name: '',
   avatar: '',
   introduction: '',
@@ -47,20 +49,24 @@ const mutations = {
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_ACCOUNT: (state, roles) => {
+    state.account = roles
   }
 }
 
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { account, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ account: account.trim(), password: md5(password) }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        commit('SET_TOKEN', data)
+        setToken(data)
         resolve()
       }).catch(error => {
+        console.log(error)
         reject(error)
       })
     })
@@ -69,24 +75,25 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getInfo({ token: state.token }).then(response => {
         const { data } = response
 
         if (!data) {
           reject('Verification failed, please Login again.')
         }
-
-        const { roles, name, avatar, introduction } = data
+        // 获取登陆信息 userDuty 权限  userName 用户名
+        const { account, userDuty, userName, userImage, userDept } = data
 
         // roles must be a non-empty array
-        if (!roles || roles.length <= 0) {
-          reject('getInfo: roles must be a non-null array!')
-        }
+        // if (!roles || roles.length <= 0) {
+        //   reject('getInfo: roles must be a non-null array!')
+        // }
 
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        commit('SET_INTRODUCTION', introduction)
+        commit('SET_ACCOUNT', account)
+        commit('SET_ROLES', userDuty)
+        commit('SET_NAME', userName)
+        commit('SET_AVATAR', userImage)
+        commit('SET_INTRODUCTION', userDept)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -98,6 +105,7 @@ const actions = {
   logout({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
+        commit('SET_ACCOUNT', '')
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()
@@ -117,6 +125,7 @@ const actions = {
   // remove token
   resetToken({ commit }) {
     return new Promise(resolve => {
+      commit('SET_ACCOUNT', '')
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
       removeToken()
@@ -135,7 +144,6 @@ const actions = {
       const { roles } = await dispatch('getInfo')
 
       resetRouter()
-
       // generate accessible routes map based on roles
       const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
 

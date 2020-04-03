@@ -3,8 +3,9 @@
     <div class="searchBtn">
       <div class="btnBox">
         <el-button type="primary" size="small" @click="searchData">查询</el-button>
+        <el-button type="primary" size="small" @click="addData">新增</el-button>
         <el-button plain size="small" @click="restData">重置</el-button>
-        <el-button type="danger" size="small" @click="deleteData">删除</el-button>
+        <el-button type="danger" size="small" @click="deleteData()">删除</el-button>
       </div>
     </div>
     <div class="searchForm">
@@ -12,12 +13,12 @@
         <el-row>
           <el-col :span="6">
             <el-form-item label="姓名">
-              <el-input v-model="searchForm.name" placeholder="请输入姓名"></el-input>
+              <el-input v-model="searchForm.userName" placeholder="请输入姓名"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="权限">
-              <el-select v-model="searchForm.jurisdiction" placeholder="请选择权限">
+              <el-select v-model="searchForm.userDuty" placeholder="请选择权限">
                 <el-option
                   v-for="item in groupList.jurisdictionList"
                   :key="item.value"
@@ -29,7 +30,7 @@
           </el-col>
           <el-col :span="6">
             <el-form-item label="部门">
-              <el-select v-model="searchForm.department" placeholder="请选择权限部门">
+              <el-select v-model="searchForm.userDept" placeholder="请选择权限部门">
                 <el-option
                   v-for="item in approverList"
                   :key="item.value"
@@ -43,53 +44,57 @@
       </el-form>
     </div>
     <div class="content">
-      <el-table
-        :data="tableData"
-        height="100%"
-        size="mini"
-        stripe
-        border
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column type="selection" align="center" width="55"></el-table-column>
-        <el-table-column type="index" align="center" width="50" label="序号"></el-table-column>
-        <template v-for="item in tableName">
-          <el-table-column
-            :key="item.userId"
-            :prop="item.prop"
-            :label="item.label"
-            align="center"
-            show-overflow-tooltip
-          ></el-table-column>
-        </template>
-        <el-table-column fixed="right" align="center" label="操作">
-          <template slot-scope="scope">
-            <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+      <div class="tableBox">
+        <el-table
+          :data="tableData"
+          height="100%"
+          size="mini"
+          stripe
+          border
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column type="selection" align="center" width="55"></el-table-column>
+          <el-table-column type="index" align="center" width="50" label="序号"></el-table-column>
+          <template v-for="item in tableName">
+            <el-table-column
+              :key="item.userId"
+              :prop="item.prop"
+              :label="item.label"
+              align="center"
+              show-overflow-tooltip
+            ></el-table-column>
           </template>
-        </el-table-column>
-      </el-table>
+          <el-table-column fixed="right" align="center" label="操作">
+            <template slot-scope="scope">
+              <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
+              <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
     </div>
     <div class="footer">
       <el-pagination
-        :current-page="page.currentPage"
+        :current-page="page.pageNum"
         :page-sizes="[20, 40, 60, 100]"
-        :page-size="page.sizes"
+        :page-size="page.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="page.total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       ></el-pagination>
     </div>
-    <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
       <JurisDictionDetail
+        ref="detailFrom"
+        :title="dialogTitle"
         :jurisdictionList="groupList.jurisdictionList"
         :approverList="approverList"
         :dialogData="dialogData"
       ></JurisDictionDetail>
       <div slot="footer" class="dialog-footer" style="text-align:center">
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="changeData">确 定</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -97,6 +102,8 @@
 </template>
 <script>
 import JurisDictionDetail from "./detail";
+import { getUsers, addUser, delUsers, updateUser } from "@/api/super";
+
 export default {
   name: "JurisDiction",
   components: {
@@ -110,20 +117,12 @@ export default {
           prop: "userName"
         },
         {
-          label: "身份",
-          prop: "userType"
-        },
-        {
-          label: "密码",
-          prop: "password"
-        },
-        {
           label: "管理部门",
-          prop: "userDept"
+          prop: "userDeptText"
         },
         {
           label: "用户权限",
-          prop: "userDuty"
+          prop: "userDutyText"
         },
         {
           label: "邮箱",
@@ -135,12 +134,16 @@ export default {
         }
       ],
       searchForm: {
-        name: "",
-        jurisdiction: "",
-        department: ""
+        userName: "",
+        userDuty: "",
+        userDept: ""
       },
       groupList: {
         jurisdictionList: [
+          {
+            label: "超级管理员",
+            value: "0"
+          },
           {
             label: "总负责人",
             value: "1"
@@ -151,85 +154,24 @@ export default {
           }
         ]
       },
-      tableData: [
-        {
-          userId: "2016-05-03",
-          password: "1234121",
-          userType: "上海",
-          userName: "vvvcczx",
-          userDept: "1",
-          userDuty: "2",
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "1232",
-          password: "1234121",
-          userType: "上海",
-          userName: "ssss",
-          userDept: "2",
-          userDuty: "1",
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "544",
-          password: "1234121",
-          userType: "上海",
-          userName: "ggg",
-          userDept: "上海市普陀区金沙江路 1518 弄",
-          userDuty: 200333,
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "2016-023",
-          password: "1234121",
-          userType: "上海",
-          userName: "普陀区",
-          userDept: "上海市普陀区金沙江路 1518 弄",
-          userDuty: 200333,
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "20143",
-          password: "1234121",
-          userType: "上海",
-          userName: "普陀区",
-          userDept: "上海市普陀区金沙江路 1518 弄",
-          userDuty: 200333,
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "2015-03",
-          password: "1234121",
-          userType: "上海",
-          userName: "普陀区",
-          userDept: "上海市普陀区金沙江路 1518 弄",
-          userDuty: 200333,
-          email: "32112",
-          userImage: "322111"
-        },
-        {
-          userId: "2016-05-03",
-          password: "1234121",
-          userType: "上海",
-          userName: "普陀区",
-          userDept: "上海市普陀区金沙江路 1518 弄",
-          userDuty: 200333,
-          email: "32112",
-          userImage: "322111"
-        }
-      ],
+      tableData: [],
+      dialogTitle: "",
       page: {
-        sizes: 20,
+        pageSize: 20,
         total: 100,
-        currentPage: 1
+        pageNum: 1
       },
       dialogFormVisible: false,
-      dialogData: {},
+      dialogData: {
+        userImage: "",
+        userDept: "",
+        userDuty: "",
+        userName: "",
+        userId: "",
+        account: "",
+        email: "",
+        password: ""
+      },
       selectTable: []
     };
   },
@@ -239,22 +181,96 @@ export default {
     }
   },
   methods: {
-    searchData() {},
-    handleEdit(index, data) {
-      this.dialogFormVisible = true;
-      this.dialogData = data;
+    searchData() {
+      let postData = Object.assign({}, this.searchForm, this.page);
+      getUsers(postData).then(res => {
+        this.page.total = res.data.size;
+        let setData = [];
+        setData = res.data.list.map(item => {
+          let setUserDept = "";
+          let setUserDuty = "";
+          // userDept 部门
+          if (item.userDept) {
+            setUserDept = this.approverList.filter(approver => {
+              if (approver.value == item.userDept) {
+                return approver;
+              }
+            });
+          }
+          // userDuty 权限
+          if (item.userDuty) {
+            setUserDuty = this.groupList.jurisdictionList.filter(approver => {
+              if (approver.value == item.userDuty) {
+                return approver;
+              }
+            });
+          }
+          item["userDeptText"] =
+            setUserDept.length > 0 ? setUserDept[0].label : "无";
+          item["userDutyText"] =
+            setUserDept.length > 0 ? setUserDuty[0].label : "无";
+          return item;
+        });
+        this.tableData = setData;
+      });
     },
-    handleDelete() {
+    addData() {
+      this.dialogTitle = "新增";
+      this.dialogData = Object.assign(
+        {},
+        this.$data.dialogData,
+        this.$options.data().dialogData
+      );
+      this.$nextTick(() => {
+        this.dialogFormVisible = true;
+      });
+    },
+    handleEdit(index, data) {
+      this.dialogTitle = "修改";
+      this.dialogData = data;
+      this.dialogFormVisible = true;
+    },
+    changeData() {
+      if (this.$refs.detailFrom.submitForm()) {
+        let setPasswrod = this.$refs.detailFrom.dialogForm.password ? this.$md5(this.$refs.detailFrom.dialogForm.password) : ''
+        this.dialogData = Object.assign(
+          {},
+          this.dialogData,
+          this.$refs.detailFrom.dialogForm,
+          { password: setPasswrod }
+        );
+        if (this.dialogTitle == "新增") {
+          addUser(this.dialogData).then(res => {
+            this.$message({
+              message: "添加成功",
+              type: "success"
+            });
+          });
+        } else {
+          updateUser(this.dialogData).then(res => {
+            this.$message({
+              message: "修改成功",
+              type: "success"
+            });
+          });
+        }
+        this.dialogFormVisible = false;
+        this.dialogData = Object.assign(
+          {},
+          this.$data.dialogData,
+          this.$options.data().dialogData
+        );
+        this.searchData();
+      }
+    },
+    handleDelete(data) {
       this.$confirm("是否删除该账号?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "删除成功!"
-          });
+          this.deleteData(data.userId);
         })
         .catch(() => {
           // this.$message({
@@ -279,7 +295,16 @@ export default {
         this.$options.data().searchForm
       );
     },
-    deleteData() {}
+    deleteData(data) {
+      let delSelect = data ? [data] : this.selectTable;
+      delUsers({ ids: delSelect }).then(res => {
+        this.searchData();
+        this.$message({
+          type: "success",
+          message: "删除成功!"
+        });
+      });
+    }
   }
 };
 </script>
