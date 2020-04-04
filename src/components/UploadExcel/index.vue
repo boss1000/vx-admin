@@ -1,8 +1,10 @@
 <template>
   <span>
     <input
+      ref="referenceUpload"
       class="input-file"
       type="file"
+      name="file"
       accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
       @change="exportData"
     />
@@ -16,7 +18,9 @@ import XLSX from "xlsx";
 export default {
   name: "InputExcel",
   data() {
-    return {};
+    return {
+      showInput: true
+    };
   },
   props: {
     title: {
@@ -35,8 +39,10 @@ export default {
       const that = this;
       // 拿取文件对象
       let f = event.currentTarget.files[0];
+      let param = new FormData(); // 创建form对象
+      param.append("file", f); // 通过append向form对象添加数据
       // 这里已经拿到了excel的file文件，若是项目需求，可直接$emit丢出文件
-      that.$emit("getMyExcelData", f);
+      that.$emit("getMyExcelData", param);
       // 用FileReader来读取
       let reader = new FileReader();
       // 重写FileReader上的readAsBinaryString方法
@@ -63,6 +69,7 @@ export default {
         reader.readAsArrayBuffer(f);
       };
       reader.readAsBinaryString(f);
+      this.$refs.referenceUpload.value = null;
     }
   }
 };

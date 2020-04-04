@@ -82,7 +82,11 @@
       ></el-pagination>
     </div>
     <el-dialog :title="titlename" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
-      <noticeDetail ref="noticeFrom" :dialogFormVisible="dialogFormVisible" :approverList="approverList"></noticeDetail>
+      <noticeDetail
+        ref="noticeFrom"
+        :dialogFormVisible="dialogFormVisible"
+        :approverList="approverList"
+      ></noticeDetail>
       <div slot="footer" class="dialog-footer" style="text-align:center">
         <el-button type="primary" @click="sureMessage()">确 定</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -146,6 +150,9 @@ export default {
       return this.$store.getters.approverList;
     }
   },
+  mounted() {
+    this.searchData();
+  },
   methods: {
     searchData() {
       let postData = Object.assign({}, this.searchForm, this.page);
@@ -166,6 +173,7 @@ export default {
             setUserDept.length > 0 ? setUserDept[0].label : "无";
           return item;
         });
+        this.page.total = res.data.total
         this.tableData = setData;
       });
     },
@@ -222,7 +230,7 @@ export default {
           type: "success",
           message: "操作成功!"
         });
-      })
+      });
     },
     openMessage() {
       // this.searchForm = Object.assign(

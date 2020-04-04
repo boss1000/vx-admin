@@ -180,6 +180,9 @@ export default {
       return this.$store.getters.approverList;
     }
   },
+  mounted() {
+    this.searchData()
+  },
   methods: {
     searchData() {
       let postData = Object.assign({}, this.searchForm, this.page);
@@ -208,7 +211,7 @@ export default {
           item["userDeptText"] =
             setUserDept.length > 0 ? setUserDept[0].label : "无";
           item["userDutyText"] =
-            setUserDept.length > 0 ? setUserDuty[0].label : "无";
+            setUserDept.length > 0 ? setUserDuty[0].label : "超级管理员";
           return item;
         });
         this.tableData = setData;

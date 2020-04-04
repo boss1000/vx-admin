@@ -4,7 +4,7 @@
       <div class="btnBox">
         <el-button type="primary" size="small" @click="searchData">查询</el-button>
         <el-button plain size="small" @click="restData">重置</el-button>
-        <el-button plain size="small" @click="approvalAll">审批</el-button>
+        <el-button plain size="small" @click="approvalOne()">审批</el-button>
       </div>
     </div>
     <div class="searchForm">
@@ -12,7 +12,7 @@
         <el-row>
           <el-col :span="6">
             <el-form-item label="姓名">
-              <el-input v-model="searchForm.name" placeholder="请输入姓名或者学号"></el-input>
+              <el-input v-model="searchForm.stuName" placeholder="请输入姓名或者学号"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -21,6 +21,7 @@
     <div class="content">
       <div class="tableBox">
         <el-table
+          v-if="showTable"
           :data="tableData"
           height="100%"
           size="mini"
@@ -38,12 +39,19 @@
               :label="item.label"
               align="center"
               show-overflow-tooltip
-            ></el-table-column>
+            >
+              <template slot-scope="scope">
+                <div v-if="item.prop == 'image'">
+                  <a @click="openImage(scope.row.image)">{{ scope.row.image }}</a>
+                </div>
+                <div v-else>{{ scope.row[item.prop] }}</div>
+              </template>
+              <!-- <template v-if="item.prop !== 'image'" slot-scope="scope">{{ scope.row[item.prop] }}</template> -->
+            </el-table-column>
           </template>
           <el-table-column fixed="right" align="center" label="操作">
             <template slot-scope="scope">
               <el-button size="mini" @click="approvalOne(scope.row)">审批</el-button>
-              <el-button size="mini" @click="openMessage(scope.row)">留言</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -51,26 +59,38 @@
     </div>
     <div class="footer">
       <el-pagination
-        :current-page="page.currentPage"
+        :current-page="page.pageNum"
         :page-sizes="[20, 40, 60, 100]"
-        :page-size="page.sizes"
+        :page-size="page.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="page.total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       ></el-pagination>
     </div>
-    <el-dialog title="留言" :visible.sync="dialogFormVisible">
-      <studentDetail :dialogData="dialogData"></studentDetail>
+    <el-dialog title="审批" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
+      <studentDetail ref="studentMessage" :dialogFormVisible="dialogFormVisible"></studentDetail>
       <div slot="footer" class="dialog-footer" style="text-align:center">
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="approvalState(2)">审批通过</el-button>
+        <el-button type="danger" @click="approvalState(1)">审批拒绝</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="图片展示" :visible.sync="imageShow" width="50%">
+      <div class="commonTemp">
+        <img :src="imageSrc" class="imgSize" />
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
 import studentDetail from "./detail";
+import {
+  getStudent,
+  examineAndApproveStudent,
+  uploadStudent,
+  distributionStudent
+} from "@/api/student";
 export default {
   name: "Approvaler",
   components: {
@@ -78,127 +98,185 @@ export default {
   },
   data() {
     return {
-      tableName: [
-        {
-          label: "姓名",
-          prop: "userName"
-        },
-        {
-          label: "身份",
-          prop: "userType"
-        },
-        {
-          label: "密码",
-          prop: "password"
-        },
-        {
-          label: "管理部门",
-          prop: "userDept"
-        },
-        {
-          label: "用户权限",
-          prop: "userDuty"
-        },
-        {
-          label: "邮箱",
-          prop: "email"
-        },
-        {
-          label: "头像url",
-          prop: "userImage"
-        }
-      ],
+      showTable: false,
+      tableName: [],
       searchForm: {
-        name: "",
-        jurisdiction: "",
-        department: ""
+        stuName: ""
       },
+      deptList: [],
       tableData: [],
       page: {
-        sizes: 20,
+        pageSize: 20,
         total: 0,
-        currentPage: 1
+        pageNum: 1
       },
+      userDistribution: "",
       dialogFormVisible: false,
+      dialogDistribution: false,
+      imageShow: false,
+      imageSrc: "",
+      imageSrcSet: "",
       dialogData: {},
       selectTable: []
     };
   },
-  computed: {
-    approverList() {
-      return this.$store.getters.approverList;
-    }
+  mounted() {
+    this.searchData();
   },
   methods: {
-    searchData() {},
-    openMessage(data) {
-      this.dialogData = data;
+    searchData() {
+      let postData = Object.assign({}, this.searchForm, this.page);
+      this.showTable = false;
+      getStudent(postData).then(res => {
+        this.judgmentRoles(res.data.list);
+        this.page.total = res.data.total
+      });
+    },
+    judgmentRoles(data) {
+      // 1 图书管 2 财务处 3 党委 4 团委 5 二级学院 6 舍管处 7 教务处
+      switch (this.$store.getters.introduction) {
+        case "1":
+          this.tableName = [
+            {
+              label: "学号",
+              prop: "stuId"
+            },
+            {
+              label: "余额",
+              prop: "owe"
+            },
+            {
+              label: "书籍",
+              prop: "book"
+            },
+            {
+              label: "状态",
+              prop: "name"
+            },
+            {
+              label: "预约时间/处理时间",
+              prop: "time"
+            },
+            {
+              label: "留言",
+              prop: "message"
+            }
+          ];
+          break;
+        case "2":
+          this.tableName = [
+            {
+              label: "学号",
+              prop: "stuId"
+            },
+            {
+              label: "宿舍费",
+              prop: "dormiFe"
+            },
+            {
+              label: "学费",
+              prop: "tuiFe"
+            },
+            {
+              label: "医疗费",
+              prop: "mediFe"
+            },
+            {
+              label: "状态",
+              prop: "name"
+            },
+            {
+              label: "预约时间/处理时间",
+              prop: "time"
+            },
+            {
+              label: "留言",
+              prop: "message"
+            }
+          ];
+          break;
+        case "3":
+          this.tableName = [
+            {
+              label: "学号",
+              prop: "stuId"
+            },
+            {
+              label: "图片",
+              prop: "image"
+            },
+            {
+              label: "状态",
+              prop: "name"
+            },
+            {
+              label: "预约时间/处理时间",
+              prop: "time"
+            },
+            {
+              label: "留言",
+              prop: "message"
+            }
+          ];
+          break;
+        case "4":
+          this.tableName = [
+            {
+              label: "学号",
+              prop: "stuId"
+            },
+            {
+              label: "图片",
+              prop: "image"
+            },
+            {
+              label: "状态",
+              prop: "name"
+            },
+            {
+              label: "预约时间/处理时间",
+              prop: "time"
+            },
+            {
+              label: "留言",
+              prop: "message"
+            }
+          ];
+          break;
+        case "5":
+          this.tableName = [];
+          break;
+        default:
+          this.tableName = [
+            {
+              label: "学号",
+              prop: "stuId"
+            },
+            {
+              label: "状态",
+              prop: "name"
+            },
+            {
+              label: "预约时间/处理时间",
+              prop: "time"
+            },
+            {
+              label: "留言",
+              prop: "message"
+            }
+          ];
+          break;
+      }
+      this.tableData = data;
+      this.$nextTick(() => {
+        this.showTable = true;
+      });
+    },
+    approvalOne(data) {
+      this.dialogData = data ? Object.assign({}, this.dialogData, data) : {};
       this.$nextTick(() => {
         this.dialogFormVisible = true;
       });
-    },
-    approvalAll() {
-      if (this.selectTable.length > 0) {
-        // this.dialogFormVisible = true;
-        // this.dialogData = data ? data : {};
-        this.$confirm("是否进行审批?", "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        })
-          .then(() => {
-            this.$message({
-              type: "success",
-              message: "审批成功!"
-            });
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消审批"
-            });
-          });
-      } else {
-        this.$message.warning("请选择审批项");
-      }
-    },
-    approvalOne(data) {
-      this.$confirm("是否进行审批?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "审批成功!"
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消审批"
-          });
-        });
-    },
-    handleDelete() {
-      this.$confirm("是否删除该账号?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "删除成功!"
-          });
-        })
-        .catch(() => {
-          // this.$message({
-          //   type: "info",
-          //   message: "已取消删除"
-          // });
-        });
     },
     handleSizeChange() {
       this.searchData();
@@ -207,7 +285,7 @@ export default {
       this.searchData();
     },
     handleSelectionChange(data) {
-      this.selectTable = data.map(item => item.userId);
+      this.selectTable = data.map(item => item.stuId);
     },
     restData() {
       this.searchForm = Object.assign(
@@ -216,7 +294,72 @@ export default {
         this.$options.data().searchForm
       );
     },
-    deleteData() {}
+    approvalState(state) {
+      // 1 审批拒绝 2 审批通过
+      this.dialogFormVisible = false;
+      let stuList =
+        Object.keys(this.dialogData).length == 0
+          ? this.selectTable
+          : [this.dialogData.stuId];
+      let postData = {
+        stuList: stuList,
+        state: state,
+        message: this.$refs.studentMessage.dialogForm.message
+      };
+      // this.$refs.studentMessage.dialogForm
+      // console.log(this.dialogData);
+      examineAndApproveStudent(postData).then(res => {
+        this.$message({
+          type: "success",
+          message: "审批成功"
+        });
+        this.searchData();
+      });
+    },
+    getMyExcelData(file) {
+      uploadStudent(file).then(res => {
+        console.log(res);
+      });
+    },
+    distribution() {
+      // 分配
+      if (this.selectTable.length > 0) {
+        this.userDistribution = "";
+        this.dialogDistribution = true;
+      } else {
+        this.$message({
+          type: "warning",
+          message: "请勾选要分配项目"
+        });
+      }
+    },
+    distributionYes() {
+      distributionStudent({
+        stuList: this.selectTable,
+        teacherId: this.userDistribution
+      }).then(res => {
+        this.$message({
+          type: "success",
+          message: "分配成功"
+        });
+        this.searchData();
+        this.dialogDistribution = false;
+      });
+    },
+    postExcal(data) {},
+    openImage(data) {
+      // 图片地址修改
+      this.imageSrc = require("../../assets/test.jpg")
+      // this.imageSrc = data
+      this.imageShow = true;
+    }
   }
 };
 </script>
+<style lang="scss" scoped>
+.imgSize {
+  width: 500px;
+  height: 500px;
+  margin: auto;
+}
+</style>>

@@ -10,8 +10,10 @@
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
     <div class="right-menu">
+      <!-- <div>1234</div> -->
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
+          <div class="namePosition">您好，{{ name }}</div>
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar" />
           <i class="el-icon-caret-bottom" />
         </div>
@@ -48,7 +50,7 @@ export default {
     Hamburger
   },
   computed: {
-    ...mapGetters(["sidebar", "avatar", "device"])
+    ...mapGetters(["sidebar", "avatar", "device", "name"])
   },
   methods: {
     toggleSideBar() {
@@ -99,6 +101,11 @@ export default {
 
     &:focus {
       outline: none;
+    }
+    .namePosition {
+      display: inline-block;
+      position: relative;
+      top: -5px;
     }
 
     .right-menu-item {

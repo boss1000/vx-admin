@@ -35,6 +35,6 @@ export function setMessage(data) {
 export function getNewMessage() {
   return request({
     url: '/spxtapi/message/getNewMessage', // 用户查询当前公告
-    method: 'GET'
+    method: 'get'
   })
 }

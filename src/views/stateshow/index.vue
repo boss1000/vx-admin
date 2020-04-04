@@ -4,41 +4,29 @@ import echarts from 'echarts';
     <div class="content">
       <div class="chartsBox">
         <div ref="statistics"></div>
-        <div></div>
+        <!-- <div></div> -->
       </div>
-      <div class="chartsBox">
+      <!-- <div class="chartsBox">
         <div></div>
         <div></div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
 <script>
 import echarts from "echarts";
 import "../../utils/shine.js";
+import { getSumStudent } from "@/api/student";
 export default {
   name: "StateXhibition",
   data() {
     return {
       chartStatistics: null,
-      echartData: [
-        {
-          name: "通过",
-          value: "272"
-        },
-        {
-          name: "待办",
-          value: "292"
-        },
-        {
-          name: "未通过",
-          value: "120"
-        }
-      ]
+      echartData: []
     };
   },
   mounted() {
-    this.initchart();
+    this.getData();
   },
   beforeDestroy() {
     if (!this.chartStatistics) {
@@ -48,12 +36,21 @@ export default {
     this.chartStatistics = null;
   },
   methods: {
+    getData() {
+      getSumStudent().then(res => {
+        res.data.forEach(item => {
+          item.name = (item.name == '0') ? '代审批' : item.name == '1' ? '处理拒绝' : '审批通过'
+        })
+        this.echartData = res.data
+        this.initchart();
+      });
+    },
     initchart() {
       this.chartStatistics = echarts.init(this.$refs.statistics, "shine");
       this.chartStatistics.setOption({
         title: [
           {
-            text: `统计信息`,
+            text: (this.echartData.length > 0) ? `统计信息` : '暂无数据',
             left: "center",
             top: "50%",
             padding: [5, 0],

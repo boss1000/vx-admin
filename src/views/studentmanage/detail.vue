@@ -4,7 +4,7 @@
       <el-row>
         <el-col :span="24">
           <el-form-item label="留言">
-            <el-input v-model="dialogForm.messageBody" class="contentBox" type="textarea"></el-input>
+            <el-input v-model="dialogForm.message" class="contentBox" type="textarea"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -27,19 +27,14 @@ export default {
   data() {
     return {
       dialogForm: {
-        messageTitle: "",
-        messageToUserId: "",
-        messageBody: ""
+        message: ""
       }
     };
   },
   watch: {
-    dialogData: {
+    dialogFormVisible: {
       handler() {
-        let handlerData = {};
-        handlerData = JSON.parse(JSON.stringify(this.dialogData));
-        handlerData.password = "";
-        this.dialogForm = Object.assign({}, this.dialogForm, handlerData);
+        this.dialogForm.message = ""
       },
       deep: true
     }

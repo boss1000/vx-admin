@@ -29,7 +29,7 @@ const state = {
 		label: '舍管处',
 		value: '6'
 	}, {
-		label: '宿舍',
+		label: '教务处',
 		value: '7'
 	}]
 }
