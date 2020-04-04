@@ -11,7 +11,7 @@
       <el-form :inline="true" :model="searchForm">
         <el-row>
           <el-col :span="6">
-            <el-form-item label="姓名">
+            <el-form-item label="学号">
               <el-input v-model="searchForm.stuName" placeholder="请输入姓名或者学号"></el-input>
             </el-form-item>
           </el-col>

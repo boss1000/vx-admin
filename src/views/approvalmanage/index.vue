@@ -5,7 +5,7 @@
         <el-button type="primary" size="small" @click="searchData">查询</el-button>
         <el-button type="primary" size="small" @click="openMessage()">新增</el-button>
         <el-button plain size="small" @click="restData">重置</el-button>
-        <el-button type="danger" size="small" @click="deleteData">删除</el-button>
+        <el-button type="danger" size="small" @click="deleteData()">删除</el-button>
       </div>
     </div>
     <div class="searchForm">
@@ -70,7 +70,12 @@
       ></el-pagination>
     </div>
     <el-dialog :title="titlename" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
-      <noticeDetail ref="noticeFrom" :dialogFormVisible="dialogFormVisible" :dialogData="dialogData" :approverList="approverList"></noticeDetail>
+      <noticeDetail
+        ref="noticeFrom"
+        :dialogFormVisible="dialogFormVisible"
+        :dialogData="dialogData"
+        :approverList="approverList"
+      ></noticeDetail>
       <div slot="footer" class="dialog-footer" style="text-align:center">
         <el-button type="primary" @click="sureMessage()">确 定</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -110,10 +115,6 @@ export default {
         {
           label: "发送时间",
           prop: "messageSendTime"
-        },
-        {
-          label: "是否已经阅读",
-          prop: "messageState"
         }
       ],
       searchForm: {
@@ -139,7 +140,7 @@ export default {
     }
   },
   mounted() {
-    this.searchData()
+    this.searchData();
   },
   methods: {
     searchData() {
@@ -161,7 +162,7 @@ export default {
             setUserDept.length > 0 ? setUserDept[0].label : "无";
           return item;
         });
-        this.page.total = res.data.total
+        this.page.total = res.data.total;
         this.tableData = setData;
       });
     },
@@ -188,7 +189,7 @@ export default {
       this.searchData();
     },
     handleSelectionChange(data) {
-      this.selectTable = data.map(item => item.userId);
+      this.selectTable = data.map(item => item.messageId);
     },
     restData() {
       this.searchForm = Object.assign(
@@ -218,7 +219,7 @@ export default {
           type: "success",
           message: "操作成功!"
         });
-      })
+      });
     },
     openMessage() {
       this.$nextTick(() => {
