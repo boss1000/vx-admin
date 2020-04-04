@@ -129,7 +129,7 @@ export default {
       this.showTable = false;
       getStudent(postData).then(res => {
         this.judgmentRoles(res.data.list);
-        this.page.total = res.data.total
+        this.page.total = res.data.total;
       });
     },
     judgmentRoles(data) {
@@ -244,7 +244,28 @@ export default {
           ];
           break;
         case "5":
-          this.tableName = [];
+          this.tableName = [
+            {
+              label: "学号",
+              prop: "stuId"
+            },
+            {
+              label: "图片",
+              prop: "image"
+            },
+            {
+              label: "状态",
+              prop: "name"
+            },
+            {
+              label: "预约时间/处理时间",
+              prop: "time"
+            },
+            {
+              label: "留言",
+              prop: "message"
+            }
+          ];
           break;
         default:
           this.tableName = [
@@ -349,7 +370,7 @@ export default {
     postExcal(data) {},
     openImage(data) {
       // 图片地址修改
-      this.imageSrc = require("../../assets/test.jpg")
+      this.imageSrc = require("../../assets/test.jpg");
       // this.imageSrc = data
       this.imageShow = true;
     }
