@@ -102,7 +102,7 @@
 </template>
 <script>
 import JurisDictionDetail from "./detail";
-import { getUsers, addUser, delUsers, updateUser } from "@/api/super";
+// import { getUsers, addUser, delUsers, updateUser } from "@/api/super";
 
 export default {
   name: "JurisDiction",
@@ -181,7 +181,7 @@ export default {
     }
   },
   mounted() {
-    this.searchData()
+    // this.searchData()
   },
   methods: {
     searchData() {

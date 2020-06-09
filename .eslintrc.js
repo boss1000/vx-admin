@@ -144,7 +144,7 @@ module.exports = {
     'no-unneeded-ternary': 0,
     'no-unreachable': 2,
     'no-unsafe-finally': 2,
-    'no-unused-vars': [2, {
+    'no-unused-vars': [0, {
       'vars': 'all',
       'args': 'none'
     }],

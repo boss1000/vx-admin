@@ -37,14 +37,12 @@ module.exports = {
       errors: true
     },
     proxy: {
-      [process.env.VUE_APP_BASE_API]: {
-        target: `http://306c1686r4.wicp.vip/`, //修改后台接口地址
-        changeOrigin: true,
-        pathRewrite: {
-          ['^' + process.env.VUE_APP_BASE_API]: ''
-        }
+      '/api': {
+        target: 'http://ccreport.chuanchengfc.com',
+        ws: true,
+        changeOrigin: true
       }
-    }
+    },
     // before: require('./mock/mock-server.js')
   },
   configureWebpack: {

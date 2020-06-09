@@ -104,60 +104,6 @@ export const asyncRoutes = [
           title: '用户管理',
           roles: ['maximum']
         }
-      },
-      {
-        path: 'noticemanage',
-        component: () => import('@/views/noticemanage'),
-        name: 'NoticeManage',
-        meta: {
-          title: '公告管理',
-          roles: ['maximum']
-        }
-      },
-      {
-        path: 'studentmanage',
-        name: 'StudentManage',
-        component: () => import('@/views/studentmanage/index'), // 学生管理
-        meta: {
-          title: '学生管理',
-          roles: ['second'] // 总负责人
-        }
-      },
-      {
-        path: 'approvalmanage',
-        name: 'ApprovalManage',
-        component: () => import('@/views/approvalmanage/index'), // 公告管理
-        meta: {
-          title: '公告管理',
-          roles: ['second'] // 总负责人
-        }
-      },
-      {
-        path: 'statexhibition',
-        name: 'StateXhibition',
-        component: () => import('@/views/statexhibition/index'), // 状态展示
-        meta: {
-          title: '状态展示',
-          roles: ['second'] // 总负责人
-        }
-      },
-      {
-        path: 'approvaler',
-        name: 'Approvaler',
-        component: () => import('@/views/approvaler/index'), // 审批管理
-        meta: {
-          title: '学生管理',
-          roles: ['three'] // 审批人员
-        }
-      },
-      {
-        path: 'stateshow',
-        name: 'stateshow',
-        component: () => import('@/views/stateshow/index'), // 状态展示
-        meta: {
-          title: '状态展示',
-          roles: ['three'] // 审批人员
-        }
       }
     ]
   },

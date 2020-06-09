@@ -1,7 +1,8 @@
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
+// import { Toast } from 'vant';
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import { MessageBox, Message } from 'element-ui'
 
 // create an axios instance
 const service = axios.create({
@@ -19,7 +20,8 @@ service.interceptors.request.use(
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
-      config.headers['token'] = getToken()
+      // xhr.setRequestHeader("Authorization", "Bearer " + $.cookie("xzb_token"));
+      config.headers['Authorization'] = "Bearer " + getToken()
     }
     return config
   },
@@ -45,38 +47,26 @@ service.interceptors.response.use(
   response => {
     const res = response.data
     // if the custom code is not 20000, it is judged as an error.
-    if (res.errorCode !== '000000') {
-      Message({
-        message: res.message || 'Error',
-        type: 'error',
-        duration: 5 * 1000
-      })
-
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.errorCode === 50008 || res.errorCode === 50012 || res.errorCode === 50014) {
-        // to re-login
-        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-          confirmButtonText: 'Re-Login',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload()
-          })
-        })
-      }
-      return Promise.reject(new Error(res.message || 'Error'))
+    if (response.status !== 200) {
+      return Promise.reject(new Error(response.Result || 'Error'))
     } else {
       return res
     }
   },
   error => {
-    console.log('err' + error) // for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+    if (error.response.data instanceof Array) {
+      Message({
+        message: error.response.data[0],
+        type: 'error',
+        duration: 5 * 1000
+      })
+    } else {
+      Message({
+        message: error.response.data,
+        type: 'error',
+        duration: 5 * 1000
+      })
+    }
     return Promise.reject(error)
   }
 )

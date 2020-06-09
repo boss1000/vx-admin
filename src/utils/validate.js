@@ -41,6 +41,15 @@ export function validLowerCase(str) {
  * @param {string} str
  * @returns {Boolean}
  */
+export function validPhone(str) {
+  const reg = /[1][3,4,5,6,7,8][0-9]{9}$/
+  return reg.test(str)
+}
+
+/**
+ * @param {string} str
+ * @returns {Boolean}
+ */
 export function validUpperCase(str) {
   const reg = /^[A-Z]+$/
   return reg.test(str)
@@ -84,4 +93,18 @@ export function isArray(arg) {
     return Object.prototype.toString.call(arg) === '[object Array]'
   }
   return Array.isArray(arg)
+}
+
+// 身份证验证
+export function IdCardValidate(idCard) {
+  const idCards = trim(idCard.replace(/ /g, ''));
+  var idcardReg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+  if (!idcardReg.test(idCards)) {
+    return false;
+  } else {
+    return true;
+  }
+  function trim(str) {
+    return str.replace(/(^\s*)|(\s*$)/g, '');
+  }
 }

@@ -1,6 +1,6 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import router, { resetRouter } from '@/router'
+import router from '@/router'
 import md5 from 'js-md5'
 
 const state = {
@@ -9,29 +9,14 @@ const state = {
   name: '',
   avatar: '',
   introduction: '',
-  roles: [],
-  approver: [{
-		label: '图书管',
-		value: '1'
-	}, {
-		label: '财务处',
-		value: '2'
-	}, {
-		label: '党委',
-		value: '3'
-	}, {
-		label: '团委',
-		value: '4'
-	}, {
-		label: '二级学院',
-		value: '5'
-	}, {
-		label: '舍管处',
-		value: '6'
-	}, {
-		label: '教务处',
-		value: '7'
-	}]
+  roles: "1",
+  otherData: {
+    company_Id: 0,
+    name: "wuyu",
+    sid: 0,
+    store_name: "123"
+  },
+  ruleData: ''
 }
 
 const mutations = {
@@ -50,8 +35,15 @@ const mutations = {
   SET_ROLES: (state, roles) => {
     state.roles = roles
   },
+  SET_OTHER: (state, roles) => {
+    let { account_type, ...otherData } = roles
+    state.otherData = otherData
+  },
   SET_ACCOUNT: (state, roles) => {
     state.account = roles
+  },
+  SET_RULEDATA: (state, roles) => {
+    state.ruleData = roles
   }
 }
 
@@ -60,41 +52,13 @@ const actions = {
   login({ commit }, userInfo) {
     const { account, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ account: account.trim(), password: md5(password) }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data)
-        setToken(data)
+      login({ Account: account.trim(), PassWord: md5(password) }).then(response => {
+        const { access_token, profile } = response.Result
+        commit('SET_TOKEN', access_token)
+        commit("SET_ROLES", profile.account_type)
+        commit("SET_OTHER", profile)
+        setToken(access_token)
         resolve()
-      }).catch(error => {
-        console.log(error)
-        reject(error)
-      })
-    })
-  },
-
-  // get user info
-  getInfo({ commit, state }) {
-    return new Promise((resolve, reject) => {
-      getInfo({ token: state.token }).then(response => {
-        const { data } = response
-
-        if (!data) {
-          reject('Verification failed, please Login again.')
-        }
-        // 获取登陆信息 userDuty 权限  userName 用户名
-        const { account, userDuty, userName, userImage, userDept } = data
-
-        // roles must be a non-empty array
-        // if (!roles || roles.length <= 0) {
-        //   reject('getInfo: roles must be a non-null array!')
-        // }
-
-        commit('SET_ACCOUNT', account)
-        commit('SET_ROLES', userDuty)
-        commit('SET_NAME', userName)
-        commit('SET_AVATAR', userImage)
-        commit('SET_INTRODUCTION', userDept)
-        resolve(data)
       }).catch(error => {
         reject(error)
       })
@@ -109,7 +73,6 @@ const actions = {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()
-        resetRouter()
 
         // reset visited views and cached views
         // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
@@ -133,28 +96,8 @@ const actions = {
     })
   },
 
-  // dynamically modify permissions
-  changeRoles({ commit, dispatch }, role) {
-    return new Promise(async resolve => {
-      const token = role + '-token'
-
-      commit('SET_TOKEN', token)
-      setToken(token)
-
-      const { roles } = await dispatch('getInfo')
-
-      resetRouter()
-      // generate accessible routes map based on roles
-      const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
-
-      // dynamically add accessible routes
-      router.addRoutes(accessRoutes)
-
-      // reset visited views and cached views
-      dispatch('tagsView/delAllViews', null, { root: true })
-
-      resolve()
-    })
+  saveRules({ commit }, data) {
+    commit('SET_RULEDATA', data)
   }
 }
 
