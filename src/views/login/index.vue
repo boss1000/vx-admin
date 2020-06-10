@@ -145,7 +145,7 @@ export default {
                 center: true
               });
               this.$router.push({
-                path: "/dashboard" || "/",
+                path: "/project" || "/",
                 query: this.otherQuery
               });
               this.loading = false;

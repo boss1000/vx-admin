@@ -50,7 +50,14 @@ service.interceptors.response.use(
     if (response.status !== 200) {
       return Promise.reject(new Error(response.Result || 'Error'))
     } else {
-      return res
+      let hasTotal = response.headers.totalcount;
+      let setRes = null
+      if (hasTotal) {
+        setRes = Object.assign({}, res, { total: Number(hasTotal) });
+      } else {
+        setRes = res;
+      }
+      return setRes
     }
   },
   error => {
@@ -61,11 +68,13 @@ service.interceptors.response.use(
         duration: 5 * 1000
       })
     } else {
-      Message({
-        message: error.response.data,
-        type: 'error',
-        duration: 5 * 1000
-      })
+      if (error.toString().indexOf('404') == -1) {
+        Message({
+          message: error.response.data,
+          type: 'error',
+          duration: 5 * 1000
+        })
+      }
     }
     return Promise.reject(error)
   }

@@ -76,6 +76,7 @@ const actions = {
       removeToken();
 
       dispatch("tagsView/delAllViews", null, { root: true });
+      resolve()
     });
   },
 

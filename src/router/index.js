@@ -1,6 +1,11 @@
 import Vue from "vue";
 import Router from "vue-router";
-import store from "@/store";
+import store from '@/store'
+import { Message } from 'element-ui'
+import { getToken } from '@/utils/auth' // get token from cookie
+import NProgress from 'nprogress' // progress bar
+import 'nprogress/nprogress.css' // progress bar style
+import getPageTitle from '@/utils/get-page-title'
 Vue.use(Router);
 
 /* Layout */
@@ -93,20 +98,38 @@ export function resetRouter() {
   const newRouter = createRouter();
   router.matcher = newRouter.matcher; // reset router
 }
+
+const whiteList = ['/login', '/auth-redirect'] // no redirect whitelist
 // 路由守卫
 router.beforeEach((to, from, next) => {
-  if (to.meta.requireAuth) {
-    if (state.getters.token) {
-      store.dispatch("permission/generateRoutes");
-      next();
+  // start progress bar
+  NProgress.start()
+
+  // set page title
+  document.title = getPageTitle(to.meta.title)
+
+  // determine whether the user has logged in
+  const hasToken = getToken()
+  if (hasToken) {
+    if (to.path === '/login') {
+      // if is logged in, redirect to the home page
+      next({ path: '/' })
+      NProgress.done()
     } else {
-      next({
-        path: "/login"
-      });
+      store.dispatch("permission/generateRoutes");
+      next()
+      NProgress.done()
     }
   } else {
-    store.dispatch("permission/generateRoutes");
-    next();
+    /* has no token*/
+    if (whiteList.indexOf(to.path) !== -1) {
+      // in the free login whitelist, go directly
+      next()
+    } else {
+      // other pages that do not have permission to access are redirected to the login page.
+      next(`/login?redirect=${to.path}`)
+      NProgress.done()
+    }
   }
 });
 
