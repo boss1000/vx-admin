@@ -1,10 +1,10 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-
-Vue.use(Router)
+import Vue from "vue";
+import Router from "vue-router";
+import store from "@/store";
+Vue.use(Router);
 
 /* Layout */
-import Layout from '@/layout'
+import Layout from "@/layout";
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -34,95 +34,80 @@ import Layout from '@/layout'
  */
 export const constantRoutes = [
   {
-    path: '/redirect',
+    path: "/redirect",
     component: Layout,
     hidden: true,
     children: [
       {
-        path: '/redirect/:path(.*)',
-        component: () => import('@/views/redirect/index')
+        path: "/redirect/:path(.*)",
+        component: () => import("@/views/redirect/index")
       }
     ]
   },
   {
-    path: '/login',
-    component: () => import('@/views/login/index'),
+    path: "/login",
+    component: () => import("@/views/login/index"),
     hidden: true
   },
   {
-    path: '/auth-redirect',
-    component: () => import('@/views/login/auth-redirect'),
+    path: "/auth-redirect",
+    component: () => import("@/views/login/auth-redirect"),
     hidden: true
   },
   {
-    path: '/404',
-    component: () => import('@/views/error-page/404'),
+    path: "/404",
+    component: () => import("@/views/error-page/404"),
     hidden: true
   },
   {
-    path: '/401',
-    component: () => import('@/views/error-page/401'),
+    path: "/401",
+    component: () => import("@/views/error-page/401"),
     hidden: true
   },
   {
-    path: '/',
+    path: "/",
     component: Layout,
-    redirect: '/dashboard',
+    redirect: "/project",
     children: [
       {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
-        meta: { title: '首页', icon: 'dashboard', affix: true }
+        path: "project",
+        component: () => import("@/views/project/index"),
+        name: "project",
+        meta: { title: "项目", icon: "dashboard" }
       }
     ]
   }
-]
+];
 
-/**
- * asyncRoutes
- * the routes that need to be dynamically loaded based on user roles
- */
-export const asyncRoutes = [
-  {
-    path: '/main',
-    component: Layout,
-    // redirect: '/main/jurisdiction',
-    alwaysShow: true, // will always show the root menu
-    name: 'main',
-    meta: {
-      title: '核心服务',
-      icon: 'user',
-      roles: ['maximum', 'second', 'three'] // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'jurisdiction',
-        component: () => import('@/views/jurisdiction'),
-        name: 'JurisDiction',
-        meta: {
-          title: '用户管理',
-          roles: ['maximum']
-        }
-      }
-    ]
-  },
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
-]
+const createRouter = () =>
+  new Router({
+    // mode: 'history', // require service support
+    scrollBehavior: () => ({ y: 0 }),
+    routes: constantRoutes
+  });
 
-const createRouter = () => new Router({
-  // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
-})
-
-const router = createRouter()
+const router = createRouter();
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
-  const newRouter = createRouter()
-  router.matcher = newRouter.matcher // reset router
+  const newRouter = createRouter();
+  router.matcher = newRouter.matcher; // reset router
 }
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  if (to.meta.requireAuth) {
+    if (state.getters.token) {
+      store.dispatch("permission/generateRoutes");
+      next();
+    } else {
+      next({
+        path: "/login"
+      });
+    }
+  } else {
+    store.dispatch("permission/generateRoutes");
+    next();
+  }
+});
 
-export default router
+export default router;
