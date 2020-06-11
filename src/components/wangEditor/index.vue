@@ -118,9 +118,11 @@ export default {
 
       this.editor.customConfig.customUploadImg = function(files, insert) {
         var formData = new FormData();
+
         for (var i = 0; i < files.length; i++) {
           formData.append("files[" + i + "]", files[i], files[i].name);
         }
+
         UploadPhysical(formData).then(res => {
           console.log(res);
           // for (var j = 0; j < da.data.length; j++) {

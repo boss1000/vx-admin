@@ -88,7 +88,9 @@ export function UploadPhysical(data) {
     method: 'post',
     data,
     config: {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     }
   })
 }
