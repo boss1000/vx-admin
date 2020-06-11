@@ -190,3 +190,6 @@ aside {
 .multiselect--active {
   z-index: 1000 !important;
 }
+.el-date-editor.el-input, .el-date-editor.el-input__inner {
+  width: 100%;
+}

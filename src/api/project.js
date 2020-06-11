@@ -80,3 +80,15 @@ export function GetDetail(data) {
     params: data
   })
 }
+
+// 上传图片
+export function UploadPhysical(data) {
+  return request({
+    url: '/api/File/UploadPhysical',
+    method: 'post',
+    data,
+    config: {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }
+  })
+}

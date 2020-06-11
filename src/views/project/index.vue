@@ -86,6 +86,18 @@
         @current-change="handleCurrentChange"
       ></el-pagination>
     </div>
+    <el-dialog
+      width="1100px"
+      :title="dialogTitle"
+      :visible.sync="dialogFormVisible"
+      :close-on-click-modal="false"
+    >
+      <ProjectDetail ref="detailFrom" :title="dialogTitle" :dialogData="dialogData"></ProjectDetail>
+      <div slot="footer" class="dialog-footer" style="text-align:center">
+        <el-button type="primary" @click="changeData">确 定</el-button>
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -97,9 +109,10 @@ import {
   ChangeSort,
   GetAreaList
 } from "@/api/project";
-
+import ProjectDetail from "./detail";
 export default {
-  name: "JurisDiction",
+  name: "Project",
+  components: { ProjectDetail },
   data() {
     return {
       searchForm: {
@@ -141,7 +154,10 @@ export default {
         { prop: "Commission", label: "佣金" },
         { prop: "Remark", label: "特别说明" }
       ],
-      selectTable: []
+      selectTable: [],
+      dialogFormVisible: false,
+      dialogTitle: "",
+      dialogData: {}
     };
   },
   mounted() {
@@ -166,7 +182,7 @@ export default {
         });
     },
     addData() {
-      this.dialogTitle = "新增";
+      this.dialogTitle = "新增项目";
       this.dialogData = Object.assign(
         {},
         this.$data.dialogData,
@@ -222,6 +238,12 @@ export default {
           message: "删除成功!"
         });
       });
+    },
+    changeData() {
+      let getData = this.$refs.detailFrom.submitForm();
+      if (getData) {
+        console.log(getData);
+      }
     }
   }
 };
