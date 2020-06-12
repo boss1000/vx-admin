@@ -86,18 +86,13 @@
         @current-change="handleCurrentChange"
       ></el-pagination>
     </div>
-    <el-dialog
-      width="1100px"
+    <ProjectDetail
+      ref="detailFrom"
+      :dialogFormVisible.sync="dialogFormVisible"
       :title="dialogTitle"
-      :visible.sync="dialogFormVisible"
-      :close-on-click-modal="false"
-    >
-      <ProjectDetail ref="detailFrom" :title="dialogTitle" :dialogData="dialogData"></ProjectDetail>
-      <div slot="footer" class="dialog-footer" style="text-align:center">
-        <el-button type="primary" @click="changeData">确 定</el-button>
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
+      :dialogData="dialogData"
+    ></ProjectDetail>
+    <MapDialog :showMap.sync="showMap"></MapDialog>
   </div>
 </template>
 <script>
@@ -110,9 +105,10 @@ import {
   GetAreaList
 } from "@/api/project";
 import ProjectDetail from "./detail";
+import MapDialog from "@/components/MapDialog/Map";
 export default {
   name: "Project",
-  components: { ProjectDetail },
+  components: { ProjectDetail, MapDialog },
   data() {
     return {
       searchForm: {
@@ -146,23 +142,32 @@ export default {
       tableName: [
         { prop: "ProjectName", label: "项目名称" },
         { prop: "ReportCount", label: "报备数" },
-        { prop: "PrincipalerName", label: "负责人" },
-        { prop: "PrincipalerMobile", label: "负责电话", width: "150px" },
-        { prop: "Discount", label: "折扣" },
-        { prop: "Developer", label: "开发商" },
+        { prop: "ResidenterName", label: "项目驻场人" },
+        { prop: "residenterMobile", label: "项目驻场人手机号", width: "150px" },
+        { prop: "PrincipalerName", label: "项目负责人" },
+        {
+          prop: "PrincipalerMobile",
+          label: "项目负责人手机号",
+          width: "150px"
+        },
+        { prop: "Area", label: "项目所在地区", width: "150px" },
+        { prop: "Discount", label: "项目优惠" },
+        { prop: "Developer", label: "项目开发商" },
         { prop: "OpeningTime", label: "开盘时间", width: "150px" },
-        { prop: "Commission", label: "佣金" },
-        { prop: "Remark", label: "特别说明" }
+        { prop: "Commission", label: "项目佣金" },
+        { prop: "Remark", label: "特别说明" },
+        { prop: "LinkAgeRules", label: "联动规则" }
       ],
       selectTable: [],
       dialogFormVisible: false,
       dialogTitle: "",
-      dialogData: {}
+      dialogData: {},
+      showMap: false
     };
   },
   mounted() {
     this.getAreaList();
-    // this.searchData()
+    // this.getDataList()
   },
   methods: {
     getAreaList() {
@@ -182,18 +187,19 @@ export default {
         });
     },
     addData() {
-      this.dialogTitle = "新增项目";
-      this.dialogData = Object.assign(
-        {},
-        this.$data.dialogData,
-        this.$options.data().dialogData
-      );
-      this.$nextTick(() => {
-        this.dialogFormVisible = true;
-      });
+      this.showMap = true;
+      // this.dialogTitle = "新增项目";
+      // this.dialogData = Object.assign(
+      //   {},
+      //   this.$data.dialogData,
+      //   this.$options.data().dialogData
+      // );
+      // this.$nextTick(() => {
+      //   this.dialogFormVisible = true;
+      // });
     },
     handleEdit(index, data) {
-      this.dialogTitle = "修改";
+      this.dialogTitle = "修改项目";
       this.dialogData = data;
       this.dialogFormVisible = true;
     },
@@ -214,10 +220,10 @@ export default {
         });
     },
     handleSizeChange() {
-      this.searchData();
+      this.getDataList();
     },
     handleCurrentChange() {
-      this.searchData();
+      this.getDataList();
     },
     handleSelectionChange(data) {
       this.selectTable = data.map(item => item.userId);
@@ -232,7 +238,7 @@ export default {
     deleteData(data) {
       let delSelect = data ? [data] : this.selectTable;
       delUsers({ ids: delSelect }).then(res => {
-        this.searchData();
+        this.getDataList();
         this.$message({
           type: "success",
           message: "删除成功!"
