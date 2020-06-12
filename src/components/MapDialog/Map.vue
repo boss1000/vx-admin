@@ -20,13 +20,14 @@
             </el-form-item>
           </el-col>
           <el-button type="primary" size="small" @click="getArea">查询</el-button>
+          <el-button type="primary" size="small" @click="saveArea">保存</el-button>
         </el-row>
       </el-form>
 
       <baidu-map
         id="mapID"
         class="map"
-        center="杭州市"
+        :center="center"
         :zoom="zoom"
         :scroll-wheel-zoom="true"
         @click="getPoint"
@@ -55,8 +56,7 @@
             @close="infoWindowClose"
             @open="infoWindowOpen"
           >
-            <p>站点：{{ add.siteName }}</p>
-            <p>站点地址：{{ add.site }}</p>
+            <p>详细地址：{{ add.site }}</p>
           </bm-info-window>
         </bm-marker>
       </baidu-map>
@@ -78,10 +78,14 @@ export default {
       baidumapSwitch: false,
       jgNameDialog: false,
       show: false,
+      center: {
+        lng: 120.639855,
+        lat: 27.773523
+      },
       postionMap: {
         // 地图坐标
-        lng: 120.211486,
-        lat: 30.256576
+        lng: null,
+        lat: null
       },
       location: "",
       keywordName: "", // 关键字
@@ -89,7 +93,7 @@ export default {
       zoom: 12.8, // 放大比例
       address: "", // 位置详细信息
       add: {
-        siteName: "",
+        point: {},
         site: "",
         jd: "",
         wd: "",
@@ -116,10 +120,11 @@ export default {
       let geocoder = new BMap.Geocoder(); // 创建地址解析器的实例
       geocoder.getLocation(e.point, rs => {
         this.add.site = rs.address;
+        this.add.point = e.point;
         this.show = true;
         // 地址描述(string)=
-        console.log(rs.address); // 这里打印可以看到里面的详细地址信息，可以根据需求选择想要的
-        console.log(rs.addressComponents); // 结构化的地址描述(object)
+        // console.log(rs.address); // 这里打印可以看到里面的详细地址信息，可以根据需求选择想要的
+        // console.log(rs.addressComponents); // 结构化的地址描述(object)
         // console.log(rs.addressComponents.province); //省
         // console.log(rs.addressComponents.city); //城市
         // console.log(rs.addressComponents.district); //区县
@@ -137,6 +142,18 @@ export default {
     },
     getArea() {
       this.keyword = JSON.stringify(this.keywordName);
+    },
+    saveArea() {
+      if (this.add.site.length) {
+        console.log(this.add);
+      } else {
+        this.$message({
+          message: "请选择具体地点",
+          type: "warning",
+          duration: 3000,
+          showClose: true
+        });
+      }
     }
   }
 };
