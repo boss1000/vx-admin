@@ -2,6 +2,7 @@
   <el-dialog
     width="1000px"
     title="项目位置"
+    append-to-body
     :visible="showMap"
     :close-on-click-modal="false"
     @close="$emit('update:showMap',false)"
@@ -71,6 +72,26 @@ export default {
     showMap: {
       type: Boolean,
       default: false
+    },
+    gpsForm: {
+      type: Object,
+      default: () => {}
+    }
+  },
+  watch: {
+    gpsForm: {
+      handler() {
+        console.log(this.gpsForm)
+        let postionMap = this.gpsForm.gps.split(",");
+        this.postionMap = {
+          lng: postionMap[0],
+          lat: postionMap[1]
+        };
+        console.log(this.gpsForm.address);
+        this.add.site = this.gpsForm.address;
+        this.show = true;
+      },
+      deep: true
     }
   },
   data() {
@@ -145,7 +166,8 @@ export default {
     },
     saveArea() {
       if (this.add.site.length) {
-        console.log(this.add);
+        this.$emit("getMap", this.add);
+        this.$emit("update:showMap", false);
       } else {
         this.$message({
           message: "请选择具体地点",

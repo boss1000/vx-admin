@@ -32,6 +32,7 @@
 		.tableBox {
 			display: flex;
 			flex: 1;
+			width: 100%;
 		}
 		.el-table {
 			/deep/ .el-table--mini th, .el-table--mini td {

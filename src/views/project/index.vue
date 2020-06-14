@@ -5,7 +5,7 @@
         <el-button type="primary" size="small" @click="getDataList">查询</el-button>
         <el-button type="primary" size="small" @click="addData">新增</el-button>
         <el-button plain size="small" @click="restData">重置</el-button>
-        <el-button type="danger" size="small" @click="deleteData()">删除</el-button>
+        <el-button type="danger" size="small" @click="judgeDel">删除</el-button>
       </div>
     </div>
     <div class="searchForm">
@@ -46,6 +46,7 @@
     <div class="content">
       <div class="tableBox">
         <el-table
+          v-loading="tableLoading"
           :data="tableData"
           height="100%"
           size="mini"
@@ -68,8 +69,8 @@
           </template>
           <el-table-column fixed="right" align="center" label="操作" width="200px">
             <template slot-scope="scope">
-              <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
-              <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+              <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
+              <el-button size="mini" type="danger" @click="deleteData(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -88,27 +89,25 @@
     </div>
     <ProjectDetail
       ref="detailFrom"
+      :areaList="groupList.areaList"
       :dialogFormVisible.sync="dialogFormVisible"
       :title="dialogTitle"
-      :dialogData="dialogData"
+      :dialogId="dialogId"
+      @getDataList="getDataList"
     ></ProjectDetail>
-    <MapDialog :showMap.sync="showMap"></MapDialog>
   </div>
 </template>
 <script>
 import {
   getProjectList,
-  AddProject,
-  EditProject,
   DelProject,
   ChangeSort,
   GetAreaList
 } from "@/api/project";
 import ProjectDetail from "./detail";
-import MapDialog from "@/components/MapDialog/Map";
 export default {
   name: "Project",
-  components: { ProjectDetail, MapDialog },
+  components: { ProjectDetail },
   data() {
     return {
       searchForm: {
@@ -140,84 +139,83 @@ export default {
       },
       tableData: [],
       tableName: [
-        { prop: "ProjectName", label: "项目名称" },
-        { prop: "ReportCount", label: "报备数" },
-        { prop: "ResidenterName", label: "项目驻场人" },
-        { prop: "residenterMobile", label: "项目驻场人手机号", width: "150px" },
-        { prop: "PrincipalerName", label: "项目负责人" },
+        { prop: "ProjectName", label: "项目名称", width: "150px" },
+        { prop: "ReportCount", label: "报备数", width: "150px" },
+        { prop: "ResidenterName", label: "项目驻场人", width: "150px" },
+        { prop: "ResidenterMobile", label: "项目驻场人手机号", width: "150px" },
+        { prop: "PrincipalerName", label: "项目负责人", width: "150px" },
         {
           prop: "PrincipalerMobile",
           label: "项目负责人手机号",
           width: "150px"
         },
-        { prop: "Area", label: "项目所在地区", width: "150px" },
+        { prop: "AreaName", label: "项目所在地区", width: "150px" },
         { prop: "Discount", label: "项目优惠" },
-        { prop: "Developer", label: "项目开发商" },
+        { prop: "Developer", label: "项目开发商", width: "150px" },
         { prop: "OpeningTime", label: "开盘时间", width: "150px" },
-        { prop: "Commission", label: "项目佣金" },
-        { prop: "Remark", label: "特别说明" },
-        { prop: "LinkAgeRules", label: "联动规则" }
+        { prop: "Commission", label: "项目佣金", width: "150px" }
+        // { prop: "Remark", label: "特别说明" },
+        // { prop: "LinkAgeRules", label: "联动规则" }
       ],
       selectTable: [],
+      tableLoading: false,
       dialogFormVisible: false,
       dialogTitle: "",
-      dialogData: {},
-      showMap: false
+      dialogId: 0
     };
   },
   mounted() {
-    this.getAreaList();
-    // this.getDataList()
+    this.init();
   },
   methods: {
+    async init() {
+      await this.getAreaList();
+      this.$nextTick(() => {
+        this.getDataList();
+      });
+    },
     getAreaList() {
       GetAreaList().then(data => {
         this.groupList.areaList = data.Result;
       });
     },
     getDataList() {
+      this.tableLoading = true;
       getProjectList(this.searchForm)
         .then(data => {
           this.page.total = data.total;
-          this.tableData = data.Result;
-          this.loading = false;
+
+          this.tableData = data.Result.map(item => {
+            this.groupList.areaList.find(data => {
+              if (data.value == item.Area) {
+                item["AreaName"] = data.text;
+                return true;
+              } else {
+                item["AreaName"] = "全部";
+                return;
+              }
+            });
+            return item;
+          });
+          // this.tableData = data.Result;
+          this.tableLoading = false;
         })
         .catch(error => {
           console.log(error);
         });
     },
     addData() {
-      this.showMap = true;
-      // this.dialogTitle = "新增项目";
-      // this.dialogData = Object.assign(
-      //   {},
-      //   this.$data.dialogData,
-      //   this.$options.data().dialogData
-      // );
-      // this.$nextTick(() => {
-      //   this.dialogFormVisible = true;
-      // });
+      // this.showMap = true;
+      this.dialogTitle = "新增项目";
+      this.dialogId = 0;
+      this.$nextTick(() => {
+        this.dialogFormVisible = true;
+      });
     },
-    handleEdit(index, data) {
+    handleEdit(data) {
       this.dialogTitle = "修改项目";
-      this.dialogData = data;
+      this.dialogId = data.Id;
       this.dialogFormVisible = true;
-    },
-    handleDelete(data) {
-      this.$confirm("是否删除该账号?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.deleteData(data.userId);
-        })
-        .catch(() => {
-          // this.$message({
-          //   type: "info",
-          //   message: "已取消删除"
-          // });
-        });
     },
     handleSizeChange() {
       this.getDataList();
@@ -226,7 +224,7 @@ export default {
       this.getDataList();
     },
     handleSelectionChange(data) {
-      this.selectTable = data.map(item => item.userId);
+      this.selectTable = data.map(item => item.Id);
     },
     restData() {
       this.searchForm = Object.assign(
@@ -235,15 +233,38 @@ export default {
         this.$options.data().searchForm
       );
     },
-    deleteData(data) {
-      let delSelect = data ? [data] : this.selectTable;
-      delUsers({ ids: delSelect }).then(res => {
-        this.getDataList();
+    judgeDel() {
+      if (this.selectTable.length > 0) {
+        this.deleteData();
+      } else {
         this.$message({
-          type: "success",
-          message: "删除成功!"
+          type: "warning",
+          message: "请选择需要删除的项目!"
         });
-      });
+      }
+    },
+    deleteData(data) {
+      this.$confirm("是否删除该账号?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          let delSelect = data ? [data.Id] : this.selectTable;
+          DelProject(delSelect).then(res => {
+            this.getDataList();
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+          });
+        })
+        .catch(() => {
+          // this.$message({
+          //   type: "info",
+          //   message: "已取消删除"
+          // });
+        });
     },
     changeData() {
       let getData = this.$refs.detailFrom.submitForm();
