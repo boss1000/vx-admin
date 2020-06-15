@@ -73,12 +73,19 @@ export const constantRoutes = [
     path: "/",
     component: Layout,
     redirect: "/project",
+    meta: { title: "目录", icon: "dashboard" },
     children: [
       {
         path: "project",
         component: () => import("@/views/project/index"),
-        name: "project",
-        meta: { title: "项目", icon: "dashboard" }
+        name: "Project",
+        meta: { title: "项目", icon: "dashboard", keepAlive: true }
+      },
+      {
+        path: "account",
+        component: () => import("@/views/account/index"),
+        name: "Account",
+        meta: { title: "账号", icon: "dashboard", keepAlive: true }
       }
     ]
   }
