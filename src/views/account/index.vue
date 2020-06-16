@@ -99,18 +99,28 @@
         @current-change="handleCurrentChange"
       ></el-pagination>
     </div>
+    <accountDetail
+      :title="title"
+      :tableData="tableData"
+      :projectList="projectList"
+      :dialogFormVisible.sync="dialogFormVisible"
+    ></accountDetail>
   </div>
 </template>
 <script>
+import { getProjectList } from "@/api/project";
 import {
   GetAccountList,
-  AddAccount,
   ModifyAccount,
   ResetPassword,
   DeleteAccount
 } from "@/api/account";
+import accountDetail from "./detail";
 export default {
   name: "Account",
+  components: {
+    accountDetail
+  },
   data() {
     return {
       searchForm: {
@@ -155,9 +165,11 @@ export default {
           }
         ]
       },
+      title: "",
       tableData: [],
       selectTable: [],
       tableLoading: false,
+      dialogFormVisible: false,
       tableName: [
         { prop: "UserName", label: "用户姓名" },
         { prop: "Mobile", label: "用户手机号" },
@@ -166,8 +178,13 @@ export default {
         { prop: "Company", label: "体系" },
         { prop: "TypeName", label: "账号类型" },
         { prop: "StatusName", label: "账号状态", width: "100px" }
-      ]
+      ],
+      projectList: []
     };
+  },
+  mounted() {
+    this.getProject();
+    this.getDataList();
   },
   methods: {
     getDataList() {
@@ -177,8 +194,29 @@ export default {
         this.tableLoading = false;
       });
     },
+    getProject() {
+      getProjectList({
+        ProjectName: "",
+        Area: "",
+        orderType: 1,
+        PageIndex: 1,
+        PageSize: 1000
+      })
+        .then(data => {
+          this.projectList = data.Result.map(item => {
+            return {
+              value: item.Id,
+              text: item.ProjectName
+            }
+          })
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
     addData() {
-      // AddAccount()
+      this.title = "账号新增";
+      this.dialogFormVisible = true;
     },
     restData() {
       this.searchForm = Object.assign(
