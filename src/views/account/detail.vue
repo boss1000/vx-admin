@@ -18,12 +18,12 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="姓名" prop="UserName">
-              <el-input v-model="dialogForm.UserName" placeholder="请输入姓名"></el-input>
+              <el-input v-model="dialogForm.UserName" :disabled="!isAdd" placeholder="请输入姓名"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="手机号" prop="Mobile">
-              <el-input v-model="dialogForm.Mobile" placeholder="请输入手机号"></el-input>
+              <el-input v-model="dialogForm.Mobile" :disabled="!isAdd" placeholder="请输入手机号"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -38,7 +38,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="体系" prop="Company">
-              <el-select v-model="dialogForm.CompanyId" placeholder="请选择体系" filterable clearable>
+              <el-select v-model="dialogForm.companyId" placeholder="请选择体系" filterable clearable>
                 <el-option
                   v-for="item in groupList.Company"
                   :key="item.value"
@@ -51,7 +51,7 @@
           <el-col :span="12">
             <el-form-item label="负责项目">
               <el-select
-                v-model="dialogForm.ProjectIds"
+                v-model="dialogForm.ResponsibleProjects"
                 placeholder="请选择负责项目"
                 multiple
                 filterable
@@ -79,6 +79,18 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item label="账号状态" prop="StatusEnum">
+              <el-select v-model="dialogForm.StatusEnum" placeholder="请选择账号类型" clearable>
+                <el-option
+                  v-for="item in groupList.StatusEnum"
+                  :key="item.value"
+                  :label="item.text"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
     </div>
@@ -90,7 +102,7 @@
 </template>
 <script>
 import { validPhone, IdCardValidate } from "@/utils/validate";
-import { AddAccount } from "@/api/account";
+import { AddAccount, ModifyAccount } from "@/api/account";
 export default {
   name: "ProjectDetail",
   props: {
@@ -106,10 +118,6 @@ export default {
       type: Array,
       default: () => []
     },
-    dialogId: {
-      type: Number,
-      default: 0
-    },
     tableData: {
       type: Array,
       default: () => []
@@ -117,6 +125,10 @@ export default {
     projectList: {
       type: Array,
       default: () => []
+    },
+    changData: {
+      type: Object,
+      default: () => {}
     }
   },
   data() {
@@ -170,6 +182,9 @@ export default {
         // ],
         TypeEnum: [
           { required: true, message: "请选择账号类型", trigger: "change" }
+        ],
+        StatusEnum: [
+          { required: true, message: "请选择账号状态", trigger: "change" }
         ]
       },
       dialogForm: {
@@ -181,7 +196,8 @@ export default {
         CompanyId: 0, // 体系Id
         Company: "", // 体系
         TypeEnum: "", // 账号类型
-        ProjectIds: [] // 负责项目
+        StatusEnum: "", // 账号状态
+        ResponsibleProjects: [] // 负责项目
       },
       groupList: {
         Company: [],
@@ -198,6 +214,20 @@ export default {
             value: 3,
             text: "中介用户账号"
           }
+        ],
+        StatusEnum: [
+          {
+            value: 0,
+            text: "停用"
+          },
+          {
+            value: 1,
+            text: "启用"
+          },
+          {
+            value: 2,
+            text: "异常"
+          }
         ]
       }
     };
@@ -210,40 +240,54 @@ export default {
       deep: true,
       immediate: true
     },
-    dialogId: {
+    tableData: {
       handler() {
-        if (this.dialogId !== 0) {
-          this.clearValidate();
+        this.groupList.Company = this.tableData
+          .map(item => {
+            if (item.Type == 1) {
+              return {
+                value: item.Id,
+                text: item.UserName
+              };
+            }
+          })
+          .filter(item => item);
+      }
+    },
+    dialogFormVisible() {
+      if (this.dialogFormVisible) {
+        if (Object.keys(this.changData).length > 0) {
+          this.dialogForm = Object.assign({}, this.dialogForm, this.changData, {
+            TypeEnum: this.changData.Type,
+            StatusEnum: this.changData.Status
+          });
         } else {
           this.restFrom();
         }
       }
-    },
-    tableData: {
-      handler() {
-        // console.log(this.tableData);
-      },
-      immediate: true
     }
   },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          AddAccount(this.dialogForm).then(res => {
-            this.$message.success("账号添加成功");
-            this.$emit("update:dialogFormVisible", false);
-          });
+          if (this.isAdd) {
+            AddAccount(this.dialogForm).then(res => {
+              this.$message.success("账号添加成功");
+              this.$emit("getDataList");
+              this.$emit("update:dialogFormVisible", false);
+            });
+          } else {
+            ModifyAccount(this.dialogForm).then(res => {
+              this.$message.success("账号修改成功");
+              this.$emit("getDataList");
+              this.$emit("update:dialogFormVisible", false);
+            });
+          }
         }
       });
     },
     restFrom() {
-      this.DetailAchae = "";
-      this.GpsForm = Object.assign(
-        {},
-        this.$data.GpsForm,
-        this.$options.data().GpsForm
-      );
       this.dialogForm = Object.assign(
         {},
         this.$data.dialogForm,
@@ -253,9 +297,7 @@ export default {
     },
     clearValidate() {
       this.$nextTick(() => {
-        this.$refs.ruleForm0.clearValidate();
-        this.$refs.ruleForm1.clearValidate();
-        this.$refs.ruleForm2.clearValidate();
+        this.$refs.ruleForm.clearValidate();
       });
     }
   }

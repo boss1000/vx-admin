@@ -78,7 +78,7 @@
             ></el-table-column>
           </template>
           <el-table-column fixed="right" align="center" label="操作" width="400px">
-            <template slot-scope="scope">
+            <template v-if="scope.row.Type !== 308" slot-scope="scope">
               <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
               <el-button size="mini" type="primary" @click="handleEdit(scope.row)">数据</el-button>
               <el-button size="mini" type="warning" @click="deleteData(scope.row)">重置密码</el-button>
@@ -101,9 +101,11 @@
     </div>
     <accountDetail
       :title="title"
+      :changData="changData"
       :tableData="tableData"
       :projectList="projectList"
       :dialogFormVisible.sync="dialogFormVisible"
+      @getDataList="getDataList"
     ></accountDetail>
   </div>
 </template>
@@ -111,7 +113,6 @@
 import { getProjectList } from "@/api/project";
 import {
   GetAccountList,
-  ModifyAccount,
   ResetPassword,
   DeleteAccount
 } from "@/api/account";
@@ -165,6 +166,7 @@ export default {
           }
         ]
       },
+      changData: {},
       title: "",
       tableData: [],
       selectTable: [],
@@ -187,6 +189,13 @@ export default {
     this.getDataList();
   },
   methods: {
+    handleEdit(item) {
+      this.title = "账号修改";
+      this.changData = item;
+      this.$nextTick(() => {
+        this.dialogFormVisible = true;
+      });
+    },
     getDataList() {
       this.tableLoading = true;
       GetAccountList(this.searchForm).then(res => {
@@ -207,8 +216,8 @@ export default {
             return {
               value: item.Id,
               text: item.ProjectName
-            }
-          })
+            };
+          });
         })
         .catch(error => {
           console.log(error);
@@ -216,7 +225,10 @@ export default {
     },
     addData() {
       this.title = "账号新增";
-      this.dialogFormVisible = true;
+      this.changData = {};
+      this.$nextTick(() => {
+        this.dialogFormVisible = true;
+      });
     },
     restData() {
       this.searchForm = Object.assign(
