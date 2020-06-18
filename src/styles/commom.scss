@@ -35,7 +35,8 @@
 			width: 100%;
 		}
 		.el-table {
-			/deep/ .el-table--mini th, .el-table--mini td {
+			/deep/ .el-table--mini th,
+			.el-table--mini td {
 				padding: 0;
 			}
 		}
@@ -104,5 +105,22 @@
 		// 	background-color: #000;
 		// 	background-color: rgba(0, 0, 0, 0.3);
 		// }
+	}
+}
+.diaTable {
+	.el-dialog__body {
+		padding: 10px;
+		.commonTemp {
+			.content {
+				margin: 0;
+				padding: 0;
+				box-shadow: none;
+			}
+			.footer {
+				margin: 0;
+				padding: 0;
+				box-shadow: none;
+			}
+		}
 	}
 }

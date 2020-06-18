@@ -80,8 +80,8 @@
           <el-table-column fixed="right" align="center" label="操作" width="400px">
             <template v-if="scope.row.Type !== 308" slot-scope="scope">
               <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
-              <el-button size="mini" type="primary" @click="handleEdit(scope.row)">数据</el-button>
-              <el-button size="mini" type="warning" @click="deleteData(scope.row)">重置密码</el-button>
+              <el-button size="mini" type="primary" @click="openReport(scope.row)">数据</el-button>
+              <el-button size="mini" type="warning" @click="resetPass(scope.row)">重置密码</el-button>
               <el-button size="mini" type="danger" @click="deleteData(scope.row)">删除</el-button>
             </template>
           </el-table-column>
@@ -107,20 +107,19 @@
       :dialogFormVisible.sync="dialogFormVisible"
       @getDataList="getDataList"
     ></accountDetail>
+    <reportDetail :reportId="reportId" :dialogReportVisible.sync="dialogReportVisible"></reportDetail>
   </div>
 </template>
 <script>
 import { getProjectList } from "@/api/project";
-import {
-  GetAccountList,
-  ResetPassword,
-  DeleteAccount
-} from "@/api/account";
+import { GetAccountList, ResetPassword, DeleteAccount } from "@/api/account";
 import accountDetail from "./detail";
+import reportDetail from "./reportDetail";
 export default {
   name: "Account",
   components: {
-    accountDetail
+    accountDetail,
+    reportDetail
   },
   data() {
     return {
@@ -172,6 +171,7 @@ export default {
       selectTable: [],
       tableLoading: false,
       dialogFormVisible: false,
+      dialogReportVisible: false,
       tableName: [
         { prop: "UserName", label: "用户姓名" },
         { prop: "Mobile", label: "用户手机号" },
@@ -181,7 +181,8 @@ export default {
         { prop: "TypeName", label: "账号类型" },
         { prop: "StatusName", label: "账号状态", width: "100px" }
       ],
-      projectList: []
+      projectList: [],
+      reportId: 0
     };
   },
   mounted() {
@@ -249,7 +250,6 @@ export default {
         .then(() => {
           let delSelect = data ? [data.Id] : this.selectTable;
           DeleteAccount(delSelect).then(res => {
-            // this.getDataList();
             this.$message({
               type: "success",
               message: "删除成功!"
@@ -262,6 +262,33 @@ export default {
           //   message: "已取消删除"
           // });
         });
+    },
+    resetPass(data) {
+      this.$confirm("是否重置密码?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          ResetPassword({ Id: data.Id }).then(res => {
+            this.$message({
+              type: "success",
+              message: "重置成功!"
+            });
+          });
+        })
+        .catch(() => {
+          // this.$message({
+          //   type: "info",
+          //   message: "已取消删除"
+          // });
+        });
+    },
+    openReport(data) {
+      this.reportId = data.Id;
+      this.$nextTick(() => {
+        this.dialogReportVisible = true;
+      });
     },
     handleSizeChange() {},
     handleCurrentChange() {}

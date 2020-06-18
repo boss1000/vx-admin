@@ -48,9 +48,9 @@ export function ChangeAccountStatus(data) {
 // 删除账号
 export function DeleteAccount(data) {
   return request({
-    url: '​​/api/Account/DeleteAccount',
-    method: 'get',
-    params: data
+    url: '/api/Account/DeleteAccount',
+    method: 'post',
+    data
   })
 }
 
