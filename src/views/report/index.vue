@@ -5,18 +5,17 @@
         <el-button type="primary" size="small" @click="getDataList">查询</el-button>
         <el-button type="primary" size="small" @click="addData">新增</el-button>
         <el-button plain size="small" @click="restData">重置</el-button>
-        <el-button type="danger" size="small" @click="deleteData">删除</el-button>
       </div>
     </div>
     <div class="searchForm">
       <el-form :inline="true" :model="searchForm" label-width="110px">
         <el-row>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="关键词">
               <el-input v-model="searchForm.Q" placeholder="请输入关键词" clearable></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="7">
             <datepicker
               titleName="日期范围"
               labelWidth="110px"
@@ -32,7 +31,7 @@
                 <el-option
                   v-for="item in groupList.sateList"
                   :key="item.value"
-                  :label="item.text"
+                  :label="item.label"
                   :value="item.value"
                 ></el-option>
               </el-select>
@@ -57,7 +56,7 @@
       <div class="tableBox">
         <el-table
           v-loading="tableLoading"
-          :data="tableData.slice((page.PageIndex-1)*page.PageSize, page.PageIndex*page.PageSize)"
+          :data="tableData.slice((searchForm.PageIndex-1)*searchForm.PageSize, searchForm.PageIndex*searchForm.PageSize)"
           height="100%"
           size="mini"
           stripe
@@ -90,9 +89,9 @@
     </div>
     <div class="footer">
       <el-pagination
-        :current-page="searchForm.PageIndex"
-        :page-sizes="[10, 20, 50, 100]"
-        :page-size="searchForm.PageSize"
+        :current-searchForm="searchForm.PageIndex"
+        :searchForm-sizes="[10, 20, 50, 100]"
+        :searchForm-size="searchForm.PageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="searchForm.total"
         @size-change="handleSizeChange"
@@ -196,7 +195,7 @@ export default {
           width: "150px"
         },
         { prop: "ReporterName", label: "报备人", width: "150px" },
-        { prop: "ReporterMobile", label: "报备人手机号" },
+        { prop: "ReporterMobile", label: "报备人手机号", width: "150px" },
         { prop: "StoreName", label: "门店", width: "150px" },
         { prop: "Remark", label: "备注", width: "150px" },
         { prop: "StatusName", label: "报备状态", width: "150px" }
@@ -206,8 +205,8 @@ export default {
     };
   },
   mounted() {
-    // this.getProject();
-    // this.getDataList();
+    this.getProject();
+    this.getDataList();
   },
   methods: {
     handleEdit(item) {
@@ -221,7 +220,7 @@ export default {
       this.tableLoading = true;
       GetAccountList(this.searchForm).then(res => {
         this.tableData = res.Result;
-        this.page.total = res.Result.length;
+        this.searchForm.total = res.Result.length;
         this.tableLoading = false;
       });
     },
@@ -312,10 +311,10 @@ export default {
       });
     },
     handleSizeChange() {
-      this.page.PageSize = val;
+      this.searchForm.PageSize = val;
     },
     handleCurrentChange(val) {
-      this.page.PageIndex = val;
+      this.searchForm.PageIndex = val;
     }
   }
 };
