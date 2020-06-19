@@ -433,10 +433,10 @@ export default {
           address: Result.Address
         };
         this.dialogForm = Object.assign({}, this.dialogForm, Result, {
-          ResidenterName: Result.Residenter.UserName, // 项目驻场人
-          ResidenterMobile: Result.Residenter.Mobile, // 项目驻场人手机号
-          PrincipalerName: Result.Principaler.UserName, // 负责人
-          PrincipalerMobile: Result.Principaler.Mobile // 项目负责人手机号
+          ResidenterName: Result.ResidenterName, // 项目驻场人
+          ResidenterMobile: Result.ResidenterMobile, // 项目驻场人手机号
+          PrincipalerName: Result.PrincipalerName, // 负责人
+          PrincipalerMobile: Result.PrincipalerMobile // 项目负责人手机号
         });
       });
     },

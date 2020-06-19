@@ -27,6 +27,15 @@ export function GetReportListByUserId(data) {
   })
 }
 
+// 根据项目Id获取报备列表
+export function GetReportListByProjectId(data) {
+  return request({
+    url: '/api/Report/GetReportListByProjectId',
+    method: 'get',
+    params: data
+  })
+}
+
 // 修改报备状态
 export function ChangeStatus(data) {
   return request({

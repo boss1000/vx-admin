@@ -12,25 +12,25 @@
       <el-form :inline="true" :model="searchForm" label-width="110px">
         <el-row>
           <el-col :span="6">
-            <el-form-item label="姓名">
-              <el-input v-model="searchForm.UserName" placeholder="请输入姓名" clearable></el-input>
+            <el-form-item label="关键词">
+              <el-input v-model="searchForm.Q" placeholder="请输入关键词" clearable></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="手机号">
-              <el-input v-model="searchForm.Mobile" placeholder="请输入手机号" clearable></el-input>
-            </el-form-item>
+            <datepicker
+              titleName="日期范围"
+              labelWidth="110px"
+              dateType="date"
+              format="yyyy-MM-dd"
+              :fristValue.sync="searchForm.DateBegin"
+              :lastValue.sync="searchForm.DateEnd"
+            ></datepicker>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="门店">
-              <el-input v-model="searchForm.Store" placeholder="请输入门店" clearable></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="账号状态">
-              <el-select v-model="searchForm.Status" placeholder="请选择账号状态" clearable>
+            <el-form-item label="状态枚举">
+              <el-select v-model="searchForm.Status" placeholder="请选择地区" clearable>
                 <el-option
-                  v-for="item in groupList.StatusList"
+                  v-for="item in groupList.sateList"
                   :key="item.value"
                   :label="item.text"
                   :value="item.value"
@@ -39,10 +39,10 @@
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="账号类型">
-              <el-select v-model="searchForm.AccountType" placeholder="请选择账号类型" clearable>
+            <el-form-item label="地区">
+              <el-select v-model="searchForm.AreaId" placeholder="请选择地区" clearable>
                 <el-option
-                  v-for="item in groupList.AccountTypeList"
+                  v-for="item in groupList.areaList"
                   :key="item.value"
                   :label="item.text"
                   :value="item.value"
@@ -90,11 +90,11 @@
     </div>
     <div class="footer">
       <el-pagination
-        :current-page="page.PageIndex"
+        :current-page="searchForm.PageIndex"
         :page-sizes="[10, 20, 50, 100]"
-        :page-size="page.PageSize"
+        :page-size="searchForm.PageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="page.total"
+        :total="searchForm.total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       ></el-pagination>
@@ -114,54 +114,61 @@
 import { getProjectList } from "@/api/project";
 import { GetAccountList, ResetPassword, DeleteAccount } from "@/api/account";
 import accountDetail from "./detail";
+import datepicker from "@/components/datepicker";
 import reportDetail from "@/components/reportDetail";
 export default {
   name: "Account",
   components: {
     accountDetail,
-    reportDetail
+    reportDetail,
+    datepicker
   },
   data() {
     return {
       searchForm: {
-        UserName: "",
-        Mobile: "",
-        Store: "",
+        Q: "",
         Status: "",
-        AccountType: ""
-      },
-      page: {
-        total: 0,
+        DateBegin: "",
+        DateEnd: "",
+        AreaId: "",
         PageIndex: 1,
-        PageSize: 10
+        PageSize: 10,
+        total: 0
       },
       groupList: {
-        StatusList: [
+        areaList: [],
+        sateList: [
           {
-            text: "停用",
-            value: 0
+            value: 1,
+            label: "界定中"
           },
           {
-            text: "启用",
-            value: 1
+            value: 2,
+            label: "有效推荐"
           },
           {
-            text: "异常",
-            value: 2
-          }
-        ],
-        AccountTypeList: [
-          {
-            text: "公司账户",
-            value: 1
+            value: 3,
+            label: "无效推荐"
           },
           {
-            text: "项目驻场",
-            value: 2
+            value: 4,
+            label: "有效带看"
           },
           {
-            text: "中介",
-            value: 3
+            value: 5,
+            label: "有效到访"
+          },
+          {
+            value: 6,
+            label: "认筹"
+          },
+          {
+            value: 7,
+            label: "认购"
+          },
+          {
+            value: 8,
+            label: "成交"
           }
         ]
       },
@@ -173,21 +180,34 @@ export default {
       dialogFormVisible: false,
       dialogReportVisible: false,
       tableName: [
-        { prop: "UserName", label: "用户姓名" },
-        { prop: "Mobile", label: "用户手机号" },
-        { prop: "StoreName", label: "门店" },
-        { prop: "IdCard", label: "身份证号码" },
-        { prop: "Company", label: "体系" },
-        { prop: "TypeName", label: "账号类型" },
-        { prop: "StatusName", label: "账号状态", width: "100px" }
+        { prop: "ProjectName", label: "项目名称", width: "150px" },
+        { prop: "PrincipalerName", label: "项目负责人姓名", width: "150px" },
+        {
+          prop: "PrincipalerMobile",
+          label: "项目负责人手机号",
+          width: "150px"
+        },
+        { prop: "CustomerName", label: "客户姓名", width: "150px" },
+        { prop: "CustomerMobile", label: "客户手机号", width: "150px" },
+        { prop: "ArriveDateTime", label: "预约来访时间", width: "150px" },
+        {
+          prop: "CompanyName",
+          label: "体系",
+          width: "150px"
+        },
+        { prop: "ReporterName", label: "报备人", width: "150px" },
+        { prop: "ReporterMobile", label: "报备人手机号" },
+        { prop: "StoreName", label: "门店", width: "150px" },
+        { prop: "Remark", label: "备注", width: "150px" },
+        { prop: "StatusName", label: "报备状态", width: "150px" }
       ],
       projectList: [],
       userId: 0
     };
   },
   mounted() {
-    this.getProject();
-    this.getDataList();
+    // this.getProject();
+    // this.getDataList();
   },
   methods: {
     handleEdit(item) {

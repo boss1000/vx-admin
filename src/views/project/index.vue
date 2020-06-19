@@ -67,9 +67,10 @@
               show-overflow-tooltip
             ></el-table-column>
           </template>
-          <el-table-column fixed="right" align="center" label="操作" width="200px">
+          <el-table-column fixed="right" align="center" label="操作" width="250px">
             <template slot-scope="scope">
               <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
+              <el-button size="mini" type="primary" @click="openReport(scope.row)">报备</el-button>
               <el-button size="mini" type="danger" @click="deleteData(scope.row)">删除</el-button>
             </template>
           </el-table-column>
@@ -95,6 +96,8 @@
       :dialogId="dialogId"
       @getDataList="getDataList"
     ></ProjectDetail>
+
+    <reportDetail :dialogId="dialogId" :dialogReportVisible.sync="dialogReportVisible"></reportDetail>
   </div>
 </template>
 <script>
@@ -105,9 +108,10 @@ import {
   GetAreaList
 } from "@/api/project";
 import ProjectDetail from "./detail";
+import reportDetail from "@/components/reportDetail";
 export default {
   name: "Project",
-  components: { ProjectDetail },
+  components: { ProjectDetail, reportDetail },
   data() {
     return {
       searchForm: {
@@ -160,6 +164,7 @@ export default {
       selectTable: [],
       tableLoading: false,
       dialogFormVisible: false,
+      dialogReportVisible: false,
       dialogTitle: "",
       dialogId: 0
     };
@@ -271,6 +276,12 @@ export default {
       if (getData) {
         console.log(getData);
       }
+    },
+    openReport(data) {
+      this.dialogId = data.Id;
+      this.$nextTick(() => {
+        this.dialogReportVisible = true;
+      });
     }
   }
 };
