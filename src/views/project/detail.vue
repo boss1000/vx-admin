@@ -244,26 +244,26 @@ export default {
             trigger: "change"
           }
         ],
-        ResidenterName: [
-          { required: true, message: "请输入项目驻场人", trigger: "blur" }
-        ],
-        ResidenterMobile: [
-          {
-            required: true,
-            validator: validatePHone,
-            trigger: "blur"
-          }
-        ],
-        PrincipalerName: [
-          { required: true, message: "请输入负责人", trigger: "blur" }
-        ],
-        PrincipalerMobile: [
-          {
-            required: true,
-            validator: validatePHone,
-            trigger: "blur"
-          }
-        ],
+        // ResidenterName: [
+        //   { required: true, message: "请输入项目驻场人", trigger: "blur" }
+        // ],
+        // ResidenterMobile: [
+        //   {
+        //     required: true,
+        //     validator: validatePHone,
+        //     trigger: "blur"
+        //   }
+        // ],
+        // PrincipalerName: [
+        //   { required: true, message: "请输入负责人", trigger: "blur" }
+        // ],
+        // PrincipalerMobile: [
+        //   {
+        //     required: true,
+        //     validator: validatePHone,
+        //     trigger: "blur"
+        //   }
+        // ],
         Discount: [{ required: true, message: "请输入折扣", trigger: "blur" }],
         Developer: [
           { required: true, message: "请输入开发商", trigger: "blur" }
