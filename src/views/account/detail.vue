@@ -51,7 +51,7 @@
           <el-col :span="12">
             <el-form-item label="负责项目">
               <el-select
-                v-model="dialogForm.ResponsibleProjects"
+                v-model="dialogForm.ProjectIds"
                 placeholder="请选择负责项目"
                 multiple
                 filterable
@@ -197,7 +197,7 @@ export default {
         Company: "", // 体系
         TypeEnum: "", // 账号类型
         StatusEnum: "", // 账号状态
-        ResponsibleProjects: [] // 负责项目
+        ProjectIds: [] // 负责项目
       },
       groupList: {
         Company: [],
