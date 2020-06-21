@@ -58,9 +58,7 @@ export default {
     },
     async logout() {
       await this.$store.dispatch("user/logout");
-      // this.$router.push(`/login?redirect=${this.$route.fullPath}`);
-      window.location.href = "http://ccreportapp.chuanchengfc.com/"
-      // window.location.href = "http://192.168.3.47:8080/"
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     }
   }
 };
