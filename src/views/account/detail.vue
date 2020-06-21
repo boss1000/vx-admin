@@ -42,7 +42,7 @@
                 <el-option
                   v-for="item in groupList.Company"
                   :key="item.value"
-                  :label="item.text"
+                  :label="item.label"
                   :value="item.value"
                 ></el-option>
               </el-select>
@@ -61,7 +61,7 @@
                 <el-option
                   v-for="item in projectList"
                   :key="item.value"
-                  :label="item.text"
+                  :label="item.label"
                   :value="item.value"
                 ></el-option>
               </el-select>
@@ -73,7 +73,7 @@
                 <el-option
                   v-for="item in groupList.TypeEnum"
                   :key="item.value"
-                  :label="item.text"
+                  :label="item.label"
                   :value="item.value"
                 ></el-option>
               </el-select>
@@ -85,7 +85,7 @@
                 <el-option
                   v-for="item in groupList.StatusEnum"
                   :key="item.value"
-                  :label="item.text"
+                  :label="item.label"
                   :value="item.value"
                 ></el-option>
               </el-select>
@@ -204,30 +204,22 @@ export default {
         TypeEnum: [
           {
             value: 1,
-            text: "公司账号"
+            label: "公司账号"
           },
           {
             value: 2,
-            text: "项目驻场账号"
+            label: "项目驻场账号"
           },
           {
             value: 3,
-            text: "中介用户账号"
+            label: "中介用户账号"
           }
         ],
         StatusEnum: [
-          {
-            value: 0,
-            text: "停用"
-          },
-          {
-            value: 1,
-            text: "启用"
-          },
-          {
-            value: 2,
-            text: "异常"
-          }
+          { label: "全部", value: null },
+          { label: "启用", value: 1 },
+          { label: "停用", value: 2 },
+          { label: "异常", value: 3 }
         ]
       }
     };
@@ -247,7 +239,7 @@ export default {
             if (item.Type == 1) {
               return {
                 value: item.Id,
-                text: item.UserName
+                textlabel: item.UserName
               };
             }
           })

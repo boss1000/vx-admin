@@ -32,7 +32,7 @@
                 <el-option
                   v-for="item in groupList.StatusList"
                   :key="item.value"
-                  :label="item.text"
+                  :label="item.label"
                   :value="item.value"
                 ></el-option>
               </el-select>
@@ -44,7 +44,7 @@
                 <el-option
                   v-for="item in groupList.AccountTypeList"
                   :key="item.value"
-                  :label="item.text"
+                  :label="item.label"
                   :value="item.value"
                 ></el-option>
               </el-select>
@@ -137,30 +137,22 @@ export default {
       },
       groupList: {
         StatusList: [
-          {
-            text: "停用",
-            value: 0
-          },
-          {
-            text: "启用",
-            value: 1
-          },
-          {
-            text: "异常",
-            value: 2
-          }
+          { label: "全部", value: null },
+          { label: "启用", value: 1 },
+          { label: "停用", value: 2 },
+          { label: "异常", value: 3 }
         ],
         AccountTypeList: [
           {
-            text: "公司账户",
+            label: "公司账户",
             value: 1
           },
           {
-            text: "项目驻场",
+            label: "项目驻场",
             value: 2
           },
           {
-            text: "中介",
+            label: "中介",
             value: 3
           }
         ]
@@ -217,7 +209,7 @@ export default {
           this.projectList = data.Result.map(item => {
             return {
               value: item.Id,
-              text: item.ProjectName
+              label: item.ProjectName
             };
           });
         })
