@@ -427,7 +427,7 @@ export default {
     getFetchId() {
       getEditProject({ Id: this.dialogId }).then(data => {
         let Result = data.Result;
-        this.DetailAchae = Result.Remark;
+        this.DetailAchae = Result.Detail;
         this.GpsForm = {
           gps: Result.GPS,
           address: Result.Address
