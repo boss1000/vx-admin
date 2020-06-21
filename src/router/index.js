@@ -2,7 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 import store from '@/store'
 import { Message } from 'element-ui'
-import { getToken } from '@/utils/auth' // get token from cookie
+import { getToken, removeToken } from '@/utils/auth' // get token from cookie
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import getPageTitle from '@/utils/get-page-title'
@@ -139,7 +139,10 @@ router.beforeEach((to, from, next) => {
       // in the free login whitelist, go directly
       next()
     } else {
+      // removeToken()
       // other pages that do not have permission to access are redirected to the login page.
+      // window.location.href = "http://ccreportapp.chuanchengfc.com/"
+      // window.location.href = "http://192.168.3.47:8080/"
       next(`/login?redirect=${to.path}`)
       NProgress.done()
     }

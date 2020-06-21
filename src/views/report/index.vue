@@ -3,7 +3,7 @@
     <div class="searchBtn">
       <div class="btnBox">
         <el-button type="primary" size="small" @click="getDataList">查询</el-button>
-        <el-button type="primary" size="small" @click="addData">新增</el-button>
+        <!-- <el-button type="primary" size="small" @click="addData">新增</el-button> -->
         <el-button plain size="small" @click="restData">重置</el-button>
       </div>
     </div>
@@ -15,7 +15,7 @@
               <el-input v-model="searchForm.Q" placeholder="请输入关键词" clearable></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="7">
+          <el-col :span="8">
             <datepicker
               titleName="日期范围"
               labelWidth="110px"
@@ -25,7 +25,7 @@
               :lastValue.sync="searchForm.DateEnd"
             ></datepicker>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="状态枚举">
               <el-select v-model="searchForm.Status" placeholder="请选择地区" clearable>
                 <el-option
@@ -37,7 +37,7 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="地区">
               <el-select v-model="searchForm.AreaId" placeholder="请选择地区" clearable>
                 <el-option
@@ -72,16 +72,14 @@
               :prop="item.prop"
               :label="item.label"
               :width="item.width"
+              :fixed="item.fixed"
               align="center"
               show-overflow-tooltip
             ></el-table-column>
           </template>
-          <el-table-column fixed="right" align="center" label="操作" width="400px">
+          <el-table-column fixed="right" align="center" label="操作" width="100px">
             <template v-if="scope.row.Type !== 308" slot-scope="scope">
               <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
-              <el-button size="mini" type="primary" @click="openReport(scope.row)">报备</el-button>
-              <el-button size="mini" type="warning" @click="resetPass(scope.row)">重置密码</el-button>
-              <el-button size="mini" type="danger" @click="deleteData(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -98,28 +96,47 @@
         @current-change="handleCurrentChange"
       ></el-pagination>
     </div>
-    <accountDetail
-      :title="title"
-      :changData="changData"
-      :tableData="tableData"
-      :projectList="projectList"
-      :dialogFormVisible.sync="dialogFormVisible"
-      @getDataList="getDataList"
-    ></accountDetail>
-    <reportDetail :userId="userId" :dialogReportVisible.sync="dialogReportVisible"></reportDetail>
+    <el-dialog
+      width="400px"
+      title="报备状态修改"
+      :visible="dialogFormVisible"
+      :close-on-click-modal="false"
+    >
+      <div class="commonTemp">
+        <el-form
+          ref="ruleForm"
+          :inline="true"
+          :model="dialogForm"
+          :rules="rules"
+          class="detailForm"
+          label-width="100px"
+        >
+          <el-form-item label="状态枚举">
+            <el-select v-model="dialogForm.Status" placeholder="请选择地区" clearable>
+              <el-option
+                v-for="item in groupList.sateList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer" style="text-align:center">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
-import { getProjectList } from "@/api/project";
-import { GetAccountList, ResetPassword, DeleteAccount } from "@/api/account";
-import accountDetail from "./detail";
+import { GetReportList, ChangeStatus } from "@/api/report";
+import { GetAreaList } from "@/api/project";
 import datepicker from "@/components/datepicker";
-import reportDetail from "@/components/reportDetail";
 export default {
   name: "Account",
   components: {
-    accountDetail,
-    reportDetail,
     datepicker
   },
   data() {
@@ -133,6 +150,10 @@ export default {
         PageIndex: 1,
         PageSize: 10,
         total: 0
+      },
+      dialogForm: {
+        ReportId: 0,
+        Status: 0
       },
       groupList: {
         areaList: [],
@@ -195,60 +216,61 @@ export default {
           width: "150px"
         },
         { prop: "ReporterName", label: "报备人", width: "150px" },
-        { prop: "ReporterMobile", label: "报备人手机号", width: "150px" },
+        { prop: "ReporterMobile", label: "报备人手机号", width: "180px" },
         { prop: "StoreName", label: "门店", width: "150px" },
         { prop: "Remark", label: "备注", width: "150px" },
-        { prop: "StatusName", label: "报备状态", width: "150px" }
+        {
+          prop: "StatusName",
+          label: "报备状态",
+          width: "150px",
+          fixed: "right"
+        }
       ],
+      rules: {
+        Status: [
+          { required: true, message: "请选择账号类型", trigger: "change" }
+        ]
+      },
       projectList: [],
       userId: 0
     };
   },
   mounted() {
-    this.getProject();
+    this.getAreaList();
     this.getDataList();
   },
   methods: {
     handleEdit(item) {
-      this.title = "账号修改";
-      this.changData = item;
+      this.dialogForm.ReportId = item.Id;
+      this.dialogForm.Status = this.groupList.sateList
+        .map(data => {
+          if (data.label == item.StatusName) {
+            return data.value;
+          }
+        })
+        .filter(item => item)[0];
       this.$nextTick(() => {
         this.dialogFormVisible = true;
+      });
+    },
+    submitForm() {
+      ChangeStatus(this.dialogForm).then(res => {
+        this.$message.success("报备状态修改成功");
+        this.dialogFormVisible = false;
+        this.getDataList();
+      });
+    },
+    getAreaList() {
+      GetAreaList().then(data => {
+        this.groupList.areaList = data.Result;
       });
     },
     getDataList() {
       this.tableLoading = true;
-      GetAccountList(this.searchForm).then(res => {
+      GetReportList(this.searchForm).then(res => {
         this.tableData = res.Result;
         this.searchForm.total = res.Result.length;
         this.tableLoading = false;
-      });
-    },
-    getProject() {
-      getProjectList({
-        ProjectName: "",
-        Area: "",
-        orderType: 1,
-        PageIndex: 1,
-        PageSize: 10
-      })
-        .then(data => {
-          this.projectList = data.Result.map(item => {
-            return {
-              value: item.Id,
-              text: item.ProjectName
-            };
-          });
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    },
-    addData() {
-      this.title = "账号新增";
-      this.changData = {};
-      this.$nextTick(() => {
-        this.dialogFormVisible = true;
       });
     },
     restData() {
@@ -303,12 +325,6 @@ export default {
           //   message: "已取消删除"
           // });
         });
-    },
-    openReport(data) {
-      this.userId = data.Id;
-      this.$nextTick(() => {
-        this.dialogReportVisible = true;
-      });
     },
     handleSizeChange() {
       this.searchForm.PageSize = val;

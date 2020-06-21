@@ -26,13 +26,14 @@
                 :prop="item.prop"
                 :label="item.label"
                 :width="item.width"
+                :fixed="item.fixed"
                 align="center"
                 show-overflow-tooltip
               ></el-table-column>
             </template>
             <el-table-column fixed="right" align="center" label="操作" width="100px">
               <template slot-scope="scope">
-                <el-button size="mini" type="primary" @click="handleEdit(scope.row)">修改状态</el-button>
+                <el-button size="mini" type="primary" @click="handleEdit(scope.row)">修改</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -50,10 +51,46 @@
         ></el-pagination>
       </div>
     </div>
+    <el-dialog
+      width="400px"
+      title="报备状态修改"
+      :visible="dialogFormVisible"
+      :close-on-click-modal="false"
+      append-to-body
+    >
+      <div class="commonTemp">
+        <el-form
+          ref="ruleForm"
+          :inline="true"
+          :model="dialogForm"
+          class="detailForm"
+          label-width="100px"
+        >
+          <el-form-item label="状态枚举">
+            <el-select v-model="dialogForm.Status" placeholder="请选择地区" clearable>
+              <el-option
+                v-for="item in groupList.sateList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer" style="text-align:center">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
+      </div>
+    </el-dialog>
   </el-dialog>
 </template>
 <script>
-import { GetReportListByUserId, GetReportListByProjectId } from "@/api/report";
+import {
+  GetReportListByUserId,
+  GetReportListByProjectId,
+  ChangeStatus
+} from "@/api/report";
 export default {
   name: "Project",
   props: {
@@ -78,23 +115,6 @@ export default {
         PageSize: 20,
         total: 0
       },
-      groupList: {
-        areaList: [],
-        typeList: [
-          {
-            text: "默认",
-            value: 1
-          },
-          {
-            text: "日期排序",
-            value: 2
-          },
-          {
-            text: "热度",
-            value: 3
-          }
-        ]
-      },
       tableData: [],
       tableName: [
         { prop: "ProjectName", label: "项目名称", width: "150px" },
@@ -113,13 +133,58 @@ export default {
           width: "150px"
         },
         { prop: "ReporterName", label: "报备人", width: "150px" },
-        { prop: "ReporterMobile", label: "报备人手机号" },
+        { prop: "ReporterMobile", label: "报备人手机号", width: "180px" },
         { prop: "StoreName", label: "门店", width: "150px" },
         { prop: "Remark", label: "备注", width: "150px" },
-        { prop: "StatusName", label: "报备状态", width: "150px" }
+        {
+          prop: "StatusName",
+          label: "报备状态",
+          width: "150px",
+          fixed: "right"
+        }
       ],
+      groupList: {
+        sateList: [
+          {
+            value: 1,
+            label: "界定中"
+          },
+          {
+            value: 2,
+            label: "有效推荐"
+          },
+          {
+            value: 3,
+            label: "无效推荐"
+          },
+          {
+            value: 4,
+            label: "有效带看"
+          },
+          {
+            value: 5,
+            label: "有效到访"
+          },
+          {
+            value: 6,
+            label: "认筹"
+          },
+          {
+            value: 7,
+            label: "认购"
+          },
+          {
+            value: 8,
+            label: "成交"
+          }
+        ]
+      },
+      dialogForm: {
+        ReportId: 0,
+        Status: 0
+      },
       tableLoading: false,
-      dialogTitle: ""
+      dialogFormVisible: false
     };
   },
   watch: {
@@ -134,7 +199,7 @@ export default {
         if (this.projectId !== 0) {
           this.searchForm.UserId = this.projectId;
           this.$nextTick(() => {
-            // this.getDataList();
+            this.getDataList();
           });
         }
       }
@@ -153,20 +218,7 @@ export default {
       GetReportListByUserId(this.searchForm)
         .then(data => {
           this.searchForm.total = data.total;
-
-          // this.tableData = data.Result.map(item => {
-          //   this.groupList.areaList.find(data => {
-          //     if (data.value == item.Area) {
-          //       item["AreaName"] = data.text;
-          //       return true;
-          //     } else {
-          //       item["AreaName"] = "全部";
-          //       return;
-          //     }
-          //   });
-          //   return item;
-          // });
-          // this.tableData = data.Result;
+          this.tableData = data.Result;
           this.tableLoading = false;
         })
         .catch(error => {
@@ -177,30 +229,32 @@ export default {
       GetReportListByProjectId(this.searchForm)
         .then(data => {
           this.searchForm.total = data.total;
-
-          // this.tableData = data.Result.map(item => {
-          //   this.groupList.areaList.find(data => {
-          //     if (data.value == item.Area) {
-          //       item["AreaName"] = data.text;
-          //       return true;
-          //     } else {
-          //       item["AreaName"] = "全部";
-          //       return;
-          //     }
-          //   });
-          //   return item;
-          // });
-          // this.tableData = data.Result;
+          this.tableData = data.Result;
           this.tableLoading = false;
         })
         .catch(error => {
           console.log(error);
         });
     },
-    handleEdit(data) {
-      this.dialogTitle = "修改项目";
-      // this.projectId = data.Id;
-      // this.dialogReportVisible = true;
+    handleEdit(item) {
+      this.dialogForm.ReportId = item.Id;
+      this.dialogForm.Status = this.groupList.sateList
+        .map(data => {
+          if (data.label == item.StatusName) {
+            return data.value;
+          }
+        })
+        .filter(item => item)[0];
+      this.$nextTick(() => {
+        this.dialogFormVisible = true;
+      });
+    },
+    submitForm() {
+      ChangeStatus(this.dialogForm).then(res => {
+        this.$message.success("报备状态修改成功");
+        this.dialogFormVisible = false;
+        this.getDataList();
+      });
     },
     handleSizeChange() {
       this.getDataList();

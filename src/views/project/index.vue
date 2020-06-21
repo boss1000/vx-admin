@@ -97,7 +97,7 @@
       @getDataList="getDataList"
     ></ProjectDetail>
 
-    <reportDetail :dialogId="dialogId" :dialogReportVisible.sync="dialogReportVisible"></reportDetail>
+    <reportDetail :projectId="reportId" :dialogReportVisible.sync="dialogReportVisible"></reportDetail>
   </div>
 </template>
 <script>
@@ -166,7 +166,8 @@ export default {
       dialogFormVisible: false,
       dialogReportVisible: false,
       dialogTitle: "",
-      dialogId: 0
+      dialogId: 0,
+      reportId: 0
     };
   },
   mounted() {
@@ -278,7 +279,7 @@ export default {
       }
     },
     openReport(data) {
-      this.dialogId = data.Id;
+      this.reportId = data.Id;
       this.$nextTick(() => {
         this.dialogReportVisible = true;
       });
