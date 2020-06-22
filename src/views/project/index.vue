@@ -203,6 +203,7 @@ export default {
             });
             return item;
           });
+          this.selectTable = [];
           // this.tableData = data.Result;
           this.tableLoading = false;
         })

@@ -1,15 +1,15 @@
-import axios from 'axios'
+import axios from "axios";
 // import { Toast } from 'vant';
-import store from '@/store'
-import { getToken } from '@/utils/auth'
-import { MessageBox, Message } from 'element-ui'
+import store from "@/store";
+import { getToken } from "@/utils/auth";
+import { MessageBox, Message } from "element-ui";
 
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
-})
+});
 
 // request interceptor
 service.interceptors.request.use(
@@ -21,23 +21,23 @@ service.interceptors.request.use(
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
       // xhr.setRequestHeader("Authorization", "Bearer " + $.cookie("xzb_token"));
-      config.headers['Authorization'] = "Bearer " + getToken()
+      config.headers["Authorization"] = "Bearer " + getToken();
     }
-    return config
+    return config;
   },
   error => {
     // do something with request error
-    console.log(error) // for debug
-    return Promise.reject(error)
+    console.log(error); // for debug
+    return Promise.reject(error);
   }
-)
+);
 
 // response interceptor
 service.interceptors.response.use(
   /**
    * If you want to get http information such as headers or status
    * Please return  response => response
-  */
+   */
 
   /**
    * Determine the request status by custom code
@@ -45,39 +45,51 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    const res = response.data
+    const res = response.data;
     // if the custom code is not 20000, it is judged as an error.
     if (response.status !== 200) {
-      return Promise.reject(new Error(response.Result || 'Error'))
+      return Promise.reject(new Error(response.Result || "Error"));
     } else {
       let hasTotal = response.headers.totalcount;
-      let setRes = null
+      let setRes = null;
       if (hasTotal) {
         setRes = Object.assign({}, res, { total: Number(hasTotal) });
       } else {
         setRes = res;
       }
-      return setRes
+      return setRes;
     }
   },
   error => {
     if (error.response.data instanceof Array) {
       Message({
         message: error.response.data[0],
-        type: 'error',
+        type: "error",
         duration: 5 * 1000
-      })
+      });
     } else {
-      if (error.toString().indexOf('404') == -1) {
+      if (error.toString().indexOf("404") > 0) {
+        Message({
+          message: '页面丢失',
+          type: "error",
+          duration: 5 * 1000
+        });
+      } else if (error.toString().indexOf("500") > 0) {
+        Message({
+          message: "出错了",
+          type: "error",
+          duration: 5 * 1000
+        });
+      } else {
         Message({
           message: error.response.data,
-          type: 'error',
+          type: "error",
           duration: 5 * 1000
-        })
+        });
       }
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
-export default service
+export default service;

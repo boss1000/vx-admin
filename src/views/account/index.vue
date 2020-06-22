@@ -5,7 +5,7 @@
         <el-button type="primary" size="small" @click="getDataList">查询</el-button>
         <el-button type="primary" size="small" @click="addData">新增</el-button>
         <el-button plain size="small" @click="restData">重置</el-button>
-        <el-button type="danger" size="small" @click="deleteData">删除</el-button>
+        <el-button type="danger" size="small" @click="judgeDel">删除</el-button>
       </div>
     </div>
     <div class="searchForm">
@@ -212,6 +212,7 @@ export default {
               label: item.ProjectName
             };
           });
+          this.selectTable = [];
         })
         .catch(error => {
           console.log(error);
@@ -233,6 +234,16 @@ export default {
     },
     handleSelectionChange(data) {
       this.selectTable = data.map(item => item.Id);
+    },
+    judgeDel() {
+      if (this.selectTable.length > 0) {
+        this.deleteData();
+      } else {
+        this.$message({
+          type: "warning",
+          message: "请选择需要删除的项目!"
+        });
+      }
     },
     deleteData(data) {
       this.$confirm("是否删除该账号?", "提示", {
