@@ -81,13 +81,11 @@ export default {
   watch: {
     gpsForm: {
       handler() {
-        console.log(this.gpsForm)
         let postionMap = this.gpsForm.gps.split(",");
         this.postionMap = {
           lng: postionMap[0],
           lat: postionMap[1]
         };
-        console.log(this.gpsForm.address);
         this.add.site = this.gpsForm.address;
         this.show = true;
       },
