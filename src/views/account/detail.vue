@@ -28,7 +28,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="门店" prop="StoreName">
-              <el-input v-model="dialogForm.StoreName" placeholder="请选择门店"></el-input>
+              <el-input v-model="dialogForm.StoreName" placeholder="请填写门店"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -38,7 +38,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="体系" prop="Company">
-              <el-select v-model="dialogForm.companyId" placeholder="请选择体系" filterable clearable>
+              <el-select v-model="dialogForm.CompanyId" placeholder="请选择体系" filterable clearable>
                 <el-option
                   v-for="item in groupList.Company"
                   :key="item.value"
@@ -216,7 +216,6 @@ export default {
           }
         ],
         StatusEnum: [
-          { label: "全部", value: null },
           { label: "启用", value: 1 },
           { label: "停用", value: 2 },
           { label: "异常", value: 3 }
