@@ -45,15 +45,6 @@ export function FollowProject(data) {
   })
 }
 
-// 地区
-export function GetAreaList(data) {
-  return request({
-    url: '/api/Area/GetAreaList',
-    method: 'get',
-    params: data
-  })
-}
-
 // 获取关注项目列表
 export function getFollowProjects(data) {
   return request({
@@ -99,6 +90,42 @@ export function getEditProject(data) {
 export function updateEditProject(data) {
   return request({
     url: '/api/Project/EditProject',
+    method: 'post',
+    data
+  })
+}
+
+// 地区
+export function GetAreaList(data) {
+  return request({
+    url: '/api/Area/GetAreaList',
+    method: 'get',
+    params: data
+  })
+}
+
+// 地区新增
+export function AddArea(data) {
+  return request({
+    url: '/api/Area/AddArea',
+    method: 'post',
+    data
+  })
+}
+
+// 地区修改
+export function EditArea(data) {
+  return request({
+    url: '/api/Area/EditArea',
+    method: 'post',
+    data
+  })
+}
+
+// 地区删除
+export function DeleteArea(data) {
+  return request({
+    url: '/api/Area/DeleteArea',
     method: 'post',
     data
   })
