@@ -46,6 +46,7 @@
     <div class="content">
       <div class="tableBox">
         <el-table
+          ref="tableBox"
           v-loading="tableLoading"
           :data="tableData"
           height="100%"
@@ -91,6 +92,7 @@
     <ProjectDetail
       ref="detailFrom"
       :areaList="groupList.areaList"
+      :accountList="groupList.AccountList"
       :dialogFormVisible.sync="dialogFormVisible"
       :title="dialogTitle"
       :dialogId="dialogId"
@@ -107,6 +109,7 @@ import {
   ChangeSort,
   GetAreaList
 } from "@/api/project";
+import { GetAccountList } from "@/api/account";
 import ProjectDetail from "./detail";
 import reportDetail from "@/components/reportDetail";
 export default {
@@ -125,6 +128,7 @@ export default {
         total: 0
       },
       groupList: {
+        AccountList: [],
         areaList: [],
         typeList: [
           {
@@ -173,11 +177,15 @@ export default {
   mounted() {
     this.init();
   },
+  activated() {
+    this.$refs.tableBox.doLayout();
+  },
   methods: {
     async init() {
       await this.getAreaList();
       this.$nextTick(() => {
         this.getDataList();
+        this.getAccountList();
       });
     },
     getAreaList() {
@@ -210,6 +218,17 @@ export default {
         .catch(error => {
           console.log(error);
         });
+    },
+    getAccountList() {
+      GetAccountList({
+        UserName: "",
+        Mobile: "",
+        Store: "",
+        Status: "",
+        AccountType: ""
+      }).then(res => {
+        this.groupList.AccountList = res.Result;
+      });
     },
     addData() {
       // this.showMap = true;
@@ -251,7 +270,7 @@ export default {
       }
     },
     deleteData(data) {
-      this.$confirm("是否删除该账号?", "提示", {
+      this.$confirm("是否删除该项目?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -288,3 +307,22 @@ export default {
   }
 };
 </script>
+<style lang="scss">
+body {
+  .el-table th.gutter {
+    display: table-cell !important;
+  }
+
+  .el-table colgroup.gutter {
+    display: table-cell !important;
+  }
+
+  .el-table .warning-row {
+    background: oldlace;
+  }
+
+  .el-table .success-row {
+    background: #f0f9eb;
+  }
+}
+</style>

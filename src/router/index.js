@@ -92,6 +92,12 @@ export const constantRoutes = [
         component: () => import("@/views/report/index"),
         name: "Account",
         meta: { title: "报备", icon: "dashboard", keepAlive: true }
+      },
+      {
+        path: "area",
+        component: () => import("@/views/area/index"),
+        name: "Account",
+        meta: { title: "地区", icon: "dashboard", keepAlive: true }
       }
     ]
   }

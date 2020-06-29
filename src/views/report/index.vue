@@ -55,6 +55,7 @@
     <div class="content">
       <div class="tableBox">
         <el-table
+          ref="tableBox"
           v-loading="tableLoading"
           :data="tableData.slice((searchForm.PageIndex-1)*searchForm.PageSize, searchForm.PageIndex*searchForm.PageSize)"
           height="100%"
@@ -234,6 +235,9 @@ export default {
       projectList: [],
       userId: 0
     };
+  },
+  activated() {
+    this.$refs.tableBox.doLayout();
   },
   mounted() {
     this.getAreaList();

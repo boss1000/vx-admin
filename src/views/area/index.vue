@@ -2,7 +2,7 @@
   <div class="commonTemp">
     <div class="searchBtn">
       <div class="btnBox">
-        <el-button type="primary" size="small" @click="getDataList">查询</el-button>
+        <el-button type="primary" size="small" @click="getAreaList">查询</el-button>
         <el-button type="primary" size="small" @click="addData">新增</el-button>
         <el-button plain size="small" @click="restData">重置</el-button>
         <el-button type="danger" size="small" @click="judgeDel">删除</el-button>
@@ -12,42 +12,8 @@
       <el-form :inline="true" :model="searchForm" label-width="110px">
         <el-row>
           <el-col :span="6">
-            <el-form-item label="姓名">
-              <el-input v-model="searchForm.UserName" placeholder="请输入姓名" clearable></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="手机号">
-              <el-input v-model="searchForm.Mobile" placeholder="请输入手机号" clearable></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="门店">
-              <el-input v-model="searchForm.Store" placeholder="请输入门店" clearable></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="账号状态">
-              <el-select v-model="searchForm.Status" placeholder="请选择账号状态" clearable>
-                <el-option
-                  v-for="item in groupList.StatusList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="账号类型">
-              <el-select v-model="searchForm.AccountType" placeholder="请选择账号类型" clearable>
-                <el-option
-                  v-for="item in groupList.AccountTypeList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
+            <el-form-item label="地区名称">
+              <el-input v-model="searchForm.AreaName" placeholder="请输入地区名称" clearable></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -81,8 +47,6 @@
           <el-table-column fixed="right" align="center" label="操作" width="400px">
             <template v-if="scope.row.Type !== 308" slot-scope="scope">
               <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
-              <el-button size="mini" type="primary" @click="openReport(scope.row)">报备</el-button>
-              <el-button size="mini" type="warning" @click="resetPass(scope.row)">重置密码</el-button>
               <el-button size="mini" type="danger" @click="deleteData(scope.row)">删除</el-button>
             </template>
           </el-table-column>
@@ -103,33 +67,24 @@
     <accountDetail
       :title="title"
       :changData="changData"
-      :tableData="tableData"
-      :projectList="projectList"
       :dialogFormVisible.sync="dialogFormVisible"
-      @getDataList="getDataList"
+      @getDataList="getAreaList"
     ></accountDetail>
-    <reportDetail :userId="userId" :dialogReportVisible.sync="dialogReportVisible"></reportDetail>
   </div>
 </template>
 <script>
 import { getProjectList } from "@/api/project";
-import { GetAccountList, ResetPassword, DeleteAccount } from "@/api/account";
+import { GetAreaList, AddArea, EditArea, DeleteArea } from "@/api/project";
 import accountDetail from "./detail";
-import reportDetail from "@/components/reportDetail";
 export default {
   name: "Account",
   components: {
-    accountDetail,
-    reportDetail
+    accountDetail
   },
   data() {
     return {
       searchForm: {
-        UserName: "",
-        Mobile: "",
-        Store: "",
-        Status: "",
-        AccountType: ""
+        AreaName: ""
       },
       page: {
         total: 0,
@@ -164,15 +119,9 @@ export default {
       selectTable: [],
       tableLoading: false,
       dialogFormVisible: false,
-      dialogReportVisible: false,
       tableName: [
-        { prop: "UserName", label: "用户姓名" },
-        { prop: "Mobile", label: "用户手机号" },
-        { prop: "StoreName", label: "门店" },
-        { prop: "IdCard", label: "身份证号码" },
-        { prop: "Company", label: "体系" },
-        { prop: "TypeName", label: "账号类型" },
-        { prop: "StatusName", label: "账号状态", width: "100px" }
+        { prop: "value", label: "地区ID" },
+        { prop: "text", label: "地区名称" }
       ],
       projectList: [],
       userId: 0
@@ -182,48 +131,26 @@ export default {
     this.$refs.tableBox.doLayout();
   },
   mounted() {
-    this.getProject();
-    this.getDataList();
+    this.getAreaList();
   },
   methods: {
     handleEdit(item) {
-      this.title = "账号修改";
+      this.title = "地区修改";
       this.changData = item;
       this.$nextTick(() => {
         this.dialogFormVisible = true;
       });
     },
-    getDataList() {
+    getAreaList() {
       this.tableLoading = true;
-      GetAccountList(this.searchForm).then(res => {
+      GetAreaList(this.searchForm).then(res => {
         this.tableData = res.Result;
         this.page.total = res.Result.length;
         this.tableLoading = false;
       });
     },
-    getProject() {
-      getProjectList({
-        ProjectName: "",
-        Area: "",
-        orderType: 1,
-        PageIndex: 1,
-        PageSize: 10
-      })
-        .then(data => {
-          this.projectList = data.Result.map(item => {
-            return {
-              value: item.Id,
-              label: item.ProjectName
-            };
-          });
-          this.selectTable = [];
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    },
     addData() {
-      this.title = "账号新增";
+      this.title = "地区新增";
       this.changData = {};
       this.$nextTick(() => {
         this.dialogFormVisible = true;
@@ -237,7 +164,7 @@ export default {
       );
     },
     handleSelectionChange(data) {
-      this.selectTable = data.map(item => item.Id);
+      this.selectTable = data.map(item => item.value);
     },
     judgeDel() {
       if (this.selectTable.length > 0) {
@@ -256,12 +183,14 @@ export default {
         type: "warning"
       })
         .then(() => {
-          let delSelect = data ? [data.Id] : this.selectTable;
-          DeleteAccount(delSelect).then(res => {
+          let delSelect = data ? [data.value] : this.selectTable;
+          DeleteArea(delSelect).then(res => {
             this.$message({
               type: "success",
               message: "删除成功!"
             });
+            this.page.PageIndex = 1;
+            this.getAreaList();
           });
         })
         .catch(() => {
@@ -271,34 +200,7 @@ export default {
           // });
         });
     },
-    resetPass(data) {
-      this.$confirm("是否重置密码?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          ResetPassword({ Id: data.Id }).then(res => {
-            this.$message({
-              type: "success",
-              message: "重置成功!"
-            });
-          });
-        })
-        .catch(() => {
-          // this.$message({
-          //   type: "info",
-          //   message: "已取消删除"
-          // });
-        });
-    },
-    openReport(data) {
-      this.userId = data.Id;
-      this.$nextTick(() => {
-        this.dialogReportVisible = true;
-      });
-    },
-    handleSizeChange() {
+    handleSizeChange(val) {
       this.page.PageSize = val;
     },
     handleCurrentChange(val) {

@@ -197,7 +197,8 @@ export default {
           });
         }
         if (this.projectId !== 0) {
-          this.searchForm.UserId = this.projectId;
+          this.searchForm.UserId = null;
+          this.searchForm.ProjectId = this.projectId;
           this.$nextTick(() => {
             this.getDataList();
           });

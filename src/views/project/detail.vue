@@ -50,7 +50,7 @@
                     <el-option
                       v-for="item in ReportMobileTypeEnumList"
                       :key="item.value"
-                      :label="item.text"
+                      :label="item.label"
                       :value="item.value"
                     ></el-option>
                   </el-select>
@@ -58,7 +58,19 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="项目驻场人" prop="ResidenterName">
-                  <el-input v-model="dialogForm.ResidenterName" placeholder="请输入负责人"></el-input>
+                  <!-- <el-input v-model="dialogForm.ResidenterName" placeholder="请输入负责人"></el-input> -->
+                  <el-select
+                    v-model="dialogForm.ResidenterName"
+                    placeholder="请选择负责人"
+                    clearable
+                  >
+                    <el-option
+                      v-for="item in groupList.ResidenterName"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -68,7 +80,19 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="项目负责人" prop="PrincipalerName">
-                  <el-input v-model="dialogForm.PrincipalerName" placeholder="请输入负责人"></el-input>
+                  <!-- <el-input v-model="dialogForm.PrincipalerName" placeholder="请输入负责人"></el-input> -->
+                  <el-select
+                    v-model="dialogForm.PrincipalerName"
+                    placeholder="请选择项目负责人"
+                    clearable
+                  >
+                    <el-option
+                      v-for="item in groupList.ResidenterName"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -216,6 +240,10 @@ export default {
     dialogId: {
       type: Number,
       default: 0
+    },
+    accountList: {
+      type: Array,
+      default: () => []
     }
   },
   components: { EditorBar, MapDialog },
@@ -294,11 +322,11 @@ export default {
       },
       ReportMobileTypeEnumList: [
         {
-          text: "全号报备",
+          label: "全号报备",
           value: 1
         },
         {
-          text: "隐号报备",
+          label: "隐号报备",
           value: 2
         }
       ],
@@ -321,6 +349,10 @@ export default {
         Detail: "", // 文字详情(富文本)
         Address: "", // 地址详情
         GPS: "" // 地址
+      },
+      groupList: {
+        ResidenterName: [], // 项目驻场人
+        PrincipalerName: [] // 负责人
       }
     };
   },
@@ -344,6 +376,20 @@ export default {
     },
     dialogFormVisible() {
       this.activeName = "0";
+    },
+    accountList: {
+      handler() {
+        this.groupList.ResidenterName = this.accountList
+          .map(item => {
+            if (item.Type == 2) {
+              return {
+                value: item.Id,
+                label: item.UserName
+              };
+            }
+          })
+          .filter(item => item);
+      }
     }
   },
   methods: {
