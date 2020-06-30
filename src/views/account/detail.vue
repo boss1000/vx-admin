@@ -249,7 +249,7 @@ export default {
             if (item.Type == 1) {
               return {
                 value: item.Id,
-                label: item.Company
+                label: item.Company ? item.Company : item.UserName
               };
             }
           })

@@ -282,7 +282,7 @@ export default {
       this.tableLoading = true;
       GetReportList(this.searchForm).then(res => {
         this.tableData = res.Result;
-        this.searchForm.total = res.Result.length;
+        this.searchForm.total = res.total;
         this.tableLoading = false;
       });
     },
