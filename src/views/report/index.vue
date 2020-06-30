@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="searchForm">
-      <el-form :inline="true" :model="searchForm" label-width="110px">
+      <el-form :inline="true" :model="searchForm" label-width="80px">
         <el-row>
           <el-col :span="5">
             <el-form-item label="关键词">
@@ -160,6 +160,10 @@ export default {
         areaList: [],
         sateList: [
           {
+            value: null,
+            label: "全部"
+          },
+          {
             value: 1,
             label: "界定中"
           },
@@ -266,7 +270,12 @@ export default {
     },
     getAreaList() {
       GetAreaList().then(data => {
-        this.groupList.areaList = data.Result;
+        this.groupList.areaList = [
+          {
+            value: null,
+            text: "全部"
+          }
+        ].concat(data.Result);
       });
     },
     getDataList() {

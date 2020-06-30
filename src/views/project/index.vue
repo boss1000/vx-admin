@@ -30,7 +30,7 @@
           </el-col>
           <el-col :span="6">
             <el-form-item label="排序类型">
-              <el-select v-model="searchForm.orderType" placeholder="请选择排序类型" clearable>
+              <el-select v-model="searchForm.orderType" placeholder="请选择排序类型">
                 <el-option
                   v-for="item in groupList.typeList"
                   :key="item.value"
@@ -190,7 +190,12 @@ export default {
     },
     getAreaList() {
       GetAreaList().then(data => {
-        this.groupList.areaList = data.Result;
+        this.groupList.areaList = [
+          {
+            value: null,
+            text: "全部"
+          }
+        ].concat(data.Result);
       });
     },
     getDataList() {

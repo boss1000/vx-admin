@@ -44,7 +44,7 @@
                 <el-form-item label="报备手机号显示" prop="ReportMobileTypeEnum">
                   <el-select
                     v-model="dialogForm.ReportMobileTypeEnum"
-                    placeholder="请选择地区"
+                    placeholder="请选择报备手机号显示"
                     clearable
                   >
                     <el-option
@@ -63,6 +63,7 @@
                     v-model="dialogForm.ResidenterId"
                     placeholder="请选择负责人"
                     clearable
+                    @change="changeMobile('ResidenterMobile',$event)"
                   >
                     <el-option
                       v-for="item in groupList"
@@ -75,7 +76,7 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="项目驻场人手机号" prop="ResidenterMobile">
-                  <el-input v-model="dialogForm.ResidenterMobile" placeholder="请输入负责人电话"></el-input>
+                  <el-input v-model="dialogForm.ResidenterMobile" placeholder="请输入负责人电话" disabled></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -85,6 +86,7 @@
                     v-model="dialogForm.PrincipalerId"
                     placeholder="请选择项目负责人"
                     clearable
+                    @change="changeMobile('PrincipalerMobile',$event)"
                   >
                     <el-option
                       v-for="item in groupList"
@@ -97,7 +99,7 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="负责人电话" prop="PrincipalerMobile">
-                  <el-input v-model="dialogForm.PrincipalerMobile" placeholder="请输入负责人电话"></el-input>
+                  <el-input v-model="dialogForm.PrincipalerMobile" placeholder="请输入负责人电话" disabled></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -124,6 +126,18 @@
               <el-col :span="8">
                 <el-form-item label="项目佣金" prop="Commission">
                   <el-input v-model="dialogForm.Commission" placeholder="请输入佣金"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="需要身份证">
+                  <el-select v-model="dialogForm.IsEnableIdCard" placeholder="请选择是否需要身份证" clearable>
+                    <el-option
+                      v-for="item in hasIDcard"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="16">
@@ -330,10 +344,20 @@ export default {
           value: 2
         }
       ],
+      hasIDcard: [
+        {
+          label: "需要",
+          value: true
+        },
+        {
+          label: "不需要",
+          value: false
+        }
+      ],
       dialogForm: {
         ProjectName: "", // 项目名称
         Area: null, // 地区
-        ReportCount: 0, // 报备数
+        ReportCount: "", // 报备数
         ReportMobileTypeEnum: null, // 报备手机号显示方式
         ResidenterId: "", // 项目驻场人
         ResidenterMobile: "", // 项目驻场人手机号
@@ -348,7 +372,8 @@ export default {
         LinkAgeRules: "", // 联动规则
         Detail: "", // 文字详情(富文本)
         Address: "", // 地址详情
-        GPS: "" // 地址
+        GPS: "", // 地址
+        IsEnableIdCard: true
       },
       groupList: []
     };
@@ -381,7 +406,8 @@ export default {
             if (item.Type == 2) {
               return {
                 value: item.Id,
-                label: item.UserName
+                label: item.UserName,
+                Mobile: item.Mobile
               };
             }
           })
@@ -503,6 +529,12 @@ export default {
         this.$refs.ruleForm1.clearValidate();
         this.$refs.ruleForm2.clearValidate();
       });
+    },
+    changeMobile(name, data) {
+      let currResidenter = this.groupList.filter(item => {
+        return item.value == data;
+      });
+      this.dialogForm[name] = currResidenter[0].Mobile;
     }
   }
 };

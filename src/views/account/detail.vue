@@ -37,18 +37,6 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="体系" prop="Company">
-              <el-select v-model="dialogForm.CompanyId" placeholder="请选择体系" filterable clearable>
-                <el-option
-                  v-for="item in groupList.Company"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
             <el-form-item label="负责项目">
               <el-select
                 v-model="dialogForm.ProjectIds"
@@ -69,7 +57,12 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="账号类型" prop="TypeEnum">
-              <el-select v-model="dialogForm.TypeEnum" placeholder="请选择账号类型" clearable>
+              <el-select
+                v-model="dialogForm.TypeEnum"
+                placeholder="请选择账号类型"
+                clearable
+                @change="TypeEnumchange"
+              >
                 <el-option
                   v-for="item in groupList.TypeEnum"
                   :key="item.value"
@@ -89,6 +82,23 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col v-if="dialogForm.TypeEnum !== 1" :span="12">
+            <el-form-item label="体系" prop="Company">
+              <el-select v-model="dialogForm.CompanyId" placeholder="请选择体系" filterable clearable>
+                <el-option
+                  v-for="item in groupList.Company"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col v-else :span="12">
+            <el-form-item label="体系名称" prop="Company">
+              <el-input v-model="dialogForm.Company" placeholder="请输入体系名称"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -193,7 +203,7 @@ export default {
         UserName: "", // 姓名
         StoreName: "", // 门店
         IdCard: "", // 身份证号码
-        CompanyId: 0, // 体系Id
+        CompanyId: null, // 体系Id
         Company: "", // 体系
         TypeEnum: "", // 账号类型
         StatusEnum: "", // 账号状态
@@ -233,12 +243,13 @@ export default {
     },
     tableData: {
       handler() {
+        // 体系
         this.groupList.Company = this.tableData
           .map(item => {
             if (item.Type == 1) {
               return {
                 value: item.Id,
-                label: item.UserName
+                label: item.Company
               };
             }
           })
@@ -277,6 +288,13 @@ export default {
           }
         }
       });
+    },
+    TypeEnumchange(value) {
+      if (value == 1) {
+        this.dialogForm.CompanyId = null;
+      } else {
+        this.dialogForm.Company = null;
+      }
     },
     restFrom() {
       this.dialogForm = Object.assign(
