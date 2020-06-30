@@ -57,15 +57,15 @@
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="项目驻场人" prop="ResidenterName">
+                <el-form-item label="项目驻场人" prop="ResidenterId">
                   <!-- <el-input v-model="dialogForm.ResidenterName" placeholder="请输入负责人"></el-input> -->
                   <el-select
-                    v-model="dialogForm.ResidenterName"
+                    v-model="dialogForm.ResidenterId"
                     placeholder="请选择负责人"
                     clearable
                   >
                     <el-option
-                      v-for="item in groupList.ResidenterName"
+                      v-for="item in groupList"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value"
@@ -79,15 +79,15 @@
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="项目负责人" prop="PrincipalerName">
+                <el-form-item label="项目负责人" prop="PrincipalerId">
                   <!-- <el-input v-model="dialogForm.PrincipalerName" placeholder="请输入负责人"></el-input> -->
                   <el-select
-                    v-model="dialogForm.PrincipalerName"
+                    v-model="dialogForm.PrincipalerId"
                     placeholder="请选择项目负责人"
                     clearable
                   >
                     <el-option
-                      v-for="item in groupList.ResidenterName"
+                      v-for="item in groupList"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value"
@@ -335,9 +335,9 @@ export default {
         Area: null, // 地区
         ReportCount: 0, // 报备数
         ReportMobileTypeEnum: null, // 报备手机号显示方式
-        ResidenterName: "", // 项目驻场人
+        ResidenterId: "", // 项目驻场人
         ResidenterMobile: "", // 项目驻场人手机号
-        PrincipalerName: "", // 负责人
+        PrincipalerId: "", // 负责人
         PrincipalerMobile: "", // 项目负责人手机号
         ImgUrl: "", // 图片
         Discount: "", // 项目优惠
@@ -350,10 +350,7 @@ export default {
         Address: "", // 地址详情
         GPS: "" // 地址
       },
-      groupList: {
-        ResidenterName: [], // 项目驻场人
-        PrincipalerName: [] // 负责人
-      }
+      groupList: []
     };
   },
   watch: {
@@ -379,7 +376,7 @@ export default {
     },
     accountList: {
       handler() {
-        this.groupList.ResidenterName = this.accountList
+        this.groupList = this.accountList
           .map(item => {
             if (item.Type == 2) {
               return {
@@ -479,9 +476,9 @@ export default {
           address: Result.Address
         };
         this.dialogForm = Object.assign({}, this.dialogForm, Result, {
-          ResidenterName: Result.ResidenterName, // 项目驻场人
+          ResidenterId: Result.ResidenterId, // 项目驻场人
           ResidenterMobile: Result.ResidenterMobile, // 项目驻场人手机号
-          PrincipalerName: Result.PrincipalerName, // 负责人
+          PrincipalerId: Result.PrincipalerId, // 负责人
           PrincipalerMobile: Result.PrincipalerMobile // 项目负责人手机号
         });
       });
