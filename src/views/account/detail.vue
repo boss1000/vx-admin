@@ -203,7 +203,7 @@ export default {
         UserName: "", // 姓名
         StoreName: "", // 门店
         IdCard: "", // 身份证号码
-        CompanyId: null, // 体系Id
+        CompanyId: 0, // 体系Id
         Company: "", // 体系
         TypeEnum: "", // 账号类型
         StatusEnum: "", // 账号状态
@@ -291,7 +291,7 @@ export default {
     },
     TypeEnumchange(value) {
       if (value == 1) {
-        this.dialogForm.CompanyId = null;
+        this.dialogForm.CompanyId = 0;
       } else {
         this.dialogForm.Company = null;
       }
