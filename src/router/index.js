@@ -1,11 +1,11 @@
 import Vue from "vue";
 import Router from "vue-router";
-import store from '@/store'
-import { Message } from 'element-ui'
-import { getToken, removeToken } from '@/utils/auth' // get token from cookie
-import NProgress from 'nprogress' // progress bar
-import 'nprogress/nprogress.css' // progress bar style
-import getPageTitle from '@/utils/get-page-title'
+import store from "@/store";
+import { Message } from "element-ui";
+import { getToken, removeToken } from "@/utils/auth"; // get token from cookie
+import NProgress from "nprogress"; // progress bar
+import "nprogress/nprogress.css"; // progress bar style
+import getPageTitle from "@/utils/get-page-title";
 Vue.use(Router);
 
 /* Layout */
@@ -98,13 +98,13 @@ export const constantRoutes = [
         component: () => import("@/views/area/index"),
         name: "Account",
         meta: { title: "地区", icon: "dashboard", keepAlive: true }
-      },
-      {
-        path: "acrecommendount",
-        component: () => import("@/views/recommend/index"),
-        name: "Recommend",
-        meta: { title: "推荐人", icon: "dashboard", keepAlive: true }
       }
+      // {
+      //   path: "acrecommendount",
+      //   component: () => import("@/views/recommend/index"),
+      //   name: "Recommend",
+      //   meta: { title: "推荐人", icon: "dashboard", keepAlive: true }
+      // }
     ]
   }
 ];
@@ -124,39 +124,39 @@ export function resetRouter() {
   router.matcher = newRouter.matcher; // reset router
 }
 
-const whiteList = ['/login', '/auth-redirect'] // no redirect whitelist
+const whiteList = ["/login", "/auth-redirect"]; // no redirect whitelist
 // 路由守卫
 router.beforeEach((to, from, next) => {
   // start progress bar
-  NProgress.start()
+  NProgress.start();
 
   // set page title
-  document.title = getPageTitle(to.meta.title)
+  document.title = getPageTitle(to.meta.title);
 
   // determine whether the user has logged in
-  const hasToken = getToken()
+  const hasToken = getToken();
   if (hasToken) {
-    if (to.path === '/login') {
+    if (to.path === "/login") {
       // if is logged in, redirect to the home page
-      next({ path: '/' })
-      NProgress.done()
+      next({ path: "/" });
+      NProgress.done();
     } else {
       store.dispatch("permission/generateRoutes");
-      next()
-      NProgress.done()
+      next();
+      NProgress.done();
     }
   } else {
     /* has no token*/
     if (whiteList.indexOf(to.path) !== -1) {
       // in the free login whitelist, go directly
-      next()
+      next();
     } else {
       // removeToken()
       // other pages that do not have permission to access are redirected to the login page.
       // window.location.href = "http://ccreportapp.chuanchengfc.com/"
       // window.location.href = "http://192.168.3.47:8080/"
-      next(`/login?redirect=${to.path}`)
-      NProgress.done()
+      next(`/login?redirect=${to.path}`);
+      NProgress.done();
     }
   }
 });

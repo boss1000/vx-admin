@@ -236,7 +236,7 @@ export default {
       handler() {
         this.groupList.Company = this.tableData
           .map(item => {
-            if (item.Type == 1) {
+            if (item.TypeId == 1) {
               return {
                 value: item.Id,
                 label: item.UserName
@@ -250,7 +250,7 @@ export default {
       if (this.dialogFormVisible) {
         if (Object.keys(this.changData).length > 0) {
           this.dialogForm = Object.assign({}, this.dialogForm, this.changData, {
-            TypeEnum: this.changData.Type,
+            TypeEnum: this.changData.TypeId,
             StatusEnum: this.changData.Status
           });
         } else {
@@ -270,7 +270,11 @@ export default {
               this.$emit("update:dialogFormVisible", false);
             });
           } else {
-            ModifyAccount(this.dialogForm).then(res => {
+            let setData = Object.assign({}, this.dialogForm, {
+              TypeEnum: this.dialogForm.TypeId,
+              StatusEnum: this.dialogForm.StatusEnum
+            });
+            ModifyAccount(setData).then(res => {
               this.$message.success("账号修改成功");
               this.$emit("getDataList");
               this.$emit("update:dialogFormVisible", false);

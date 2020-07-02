@@ -357,7 +357,7 @@ export default {
       dialogForm: {
         ProjectName: "", // 项目名称
         Area: null, // 地区
-        ReportCount: "", // 报备数
+        ReportCount: 0, // 报备数
         ReportMobileTypeEnum: null, // 报备手机号显示方式
         ResidenterId: "", // 项目驻场人
         ResidenterMobile: "", // 项目驻场人手机号

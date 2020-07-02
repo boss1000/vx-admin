@@ -78,14 +78,11 @@
               show-overflow-tooltip
             ></el-table-column>
           </template>
-          <!-- <el-table-column fixed="right" align="center" label="操作" width="400px">
-            <template v-if="scope.row.Type !== 308" slot-scope="scope">
-              <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
-              <el-button size="mini" type="primary" @click="openReport(scope.row)">报备</el-button>
-              <el-button size="mini" type="warning" @click="resetPass(scope.row)">重置密码</el-button>
+          <el-table-column fixed="right" align="center" label="操作" width="100px">
+            <template slot-scope="scope">
               <el-button size="mini" type="danger" @click="deleteData(scope.row)">删除</el-button>
             </template>
-          </el-table-column> -->
+          </el-table-column>
         </el-table>
       </div>
     </div>
@@ -100,16 +97,12 @@
         @current-change="handleCurrentChange"
       ></el-pagination>
     </div>
-    <accountDetail
-      :dialogFormVisible.sync="dialogFormVisible"
-      @getDataList="getDataList"
-    ></accountDetail>
+    <accountDetail :dialogFormVisible.sync="dialogFormVisible" @getDataList="getDataList"></accountDetail>
     <reportDetail :userId="userId" :dialogReportVisible.sync="dialogReportVisible"></reportDetail>
   </div>
 </template>
 <script>
-import { getProjectList } from "@/api/project";
-import { GetAccountList, ResetPassword, DeleteAccount } from "@/api/account";
+import { GetAccountList, ModifyAccount } from "@/api/account";
 import accountDetail from "./detail";
 import reportDetail from "@/components/reportDetail";
 export default {
@@ -171,7 +164,6 @@ export default {
         { prop: "TypeName", label: "账号类型" },
         { prop: "StatusName", label: "账号状态", width: "100px" }
       ],
-      projectList: [],
       userId: 0
     };
   },
@@ -179,7 +171,6 @@ export default {
     this.$refs.tableBox.doLayout();
   },
   mounted() {
-    this.getProject();
     this.getDataList();
   },
   methods: {
@@ -197,27 +188,6 @@ export default {
         this.page.total = res.Result.length;
         this.tableLoading = false;
       });
-    },
-    getProject() {
-      getProjectList({
-        ProjectName: "",
-        Area: "",
-        orderType: 1,
-        PageIndex: 1,
-        PageSize: 10
-      })
-        .then(data => {
-          this.projectList = data.Result.map(item => {
-            return {
-              value: item.Id,
-              label: item.ProjectName
-            };
-          });
-          this.selectTable = [];
-        })
-        .catch(error => {
-          console.log(error);
-        });
     },
     addData() {
       this.title = "账号新增";
@@ -252,42 +222,34 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       })
-        .then(() => {
+        .then(async() => {
           let delSelect = data ? [data.Id] : this.selectTable;
-          DeleteAccount(delSelect).then(res => {
-            this.$message({
-              type: "success",
-              message: "删除成功!"
-            });
-          });
+          let results = await Promise.all(
+            delSelect.map(async item => {
+              this.tableData.map(async data => {
+                if (item == data.Id) {
+                  let setData = Object.assign({}, data, {
+                    isReferrer: false,
+                    TypeEnum: data.Type,
+                    StatusEnum: data.Status
+                  });
+                  return await ModifyAccount(setData);
+                }
+              });
+            })
+          );
+          await this.changeAccount();
         })
         .catch(() => {
-          // this.$message({
-          //   type: "info",
-          //   message: "已取消删除"
-          // });
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
         });
     },
-    resetPass(data) {
-      this.$confirm("是否重置密码?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          ResetPassword({ Id: data.Id }).then(res => {
-            this.$message({
-              type: "success",
-              message: "重置成功!"
-            });
-          });
-        })
-        .catch(() => {
-          // this.$message({
-          //   type: "info",
-          //   message: "已取消删除"
-          // });
-        });
+    changeAccount() {
+      this.$message.success("推荐人删除成功");
+      this.getDataList();
     },
     openReport(data) {
       this.userId = data.Id;

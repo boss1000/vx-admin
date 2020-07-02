@@ -88,7 +88,11 @@ export default {
             this.dialogForm.Id.map(async item => {
               this.accountList.map(async data => {
                 if (item == data.Id) {
-                  let setData = Object.assign({}, data, { isReferrer: true });
+                  let setData = Object.assign({}, data, {
+                    isReferrer: true,
+                    TypeEnum: data.Type,
+                    StatusEnum: data.Status
+                  });
                   return await ModifyAccount(setData);
                 }
               });

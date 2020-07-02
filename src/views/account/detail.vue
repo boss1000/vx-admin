@@ -39,7 +39,7 @@
           <el-col :span="12">
             <el-form-item label="负责项目">
               <el-select
-                v-model="dialogForm.ProjectIds"
+                v-model="dialogForm.ResponsibleProjects"
                 placeholder="请选择负责项目"
                 multiple
                 filterable
@@ -56,15 +56,15 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="账号类型" prop="TypeEnum">
+            <el-form-item label="账号类型" prop="Type">
               <el-select
-                v-model="dialogForm.TypeEnum"
+                v-model="dialogForm.Type"
                 placeholder="请选择账号类型"
                 clearable
                 @change="TypeEnumchange"
               >
                 <el-option
-                  v-for="item in groupList.TypeEnum"
+                  v-for="item in groupList.Type"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -73,10 +73,10 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="账号状态" prop="StatusEnum">
-              <el-select v-model="dialogForm.StatusEnum" placeholder="请选择账号类型" clearable>
+            <el-form-item label="账号状态" prop="Status">
+              <el-select v-model="dialogForm.Status" placeholder="请选择账号类型" clearable>
                 <el-option
-                  v-for="item in groupList.StatusEnum"
+                  v-for="item in groupList.Status"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -84,8 +84,8 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col v-if="dialogForm.TypeEnum !== 1" :span="12">
-            <el-form-item label="体系" prop="Company">
+          <el-col v-if="dialogForm.Type !== 1" :span="12">
+            <el-form-item label="体系" prop="companyId">
               <el-select v-model="dialogForm.CompanyId" placeholder="请选择体系" filterable clearable>
                 <el-option
                   v-for="item in groupList.Company"
@@ -190,10 +190,10 @@ export default {
         //     trigger: "change"
         //   }
         // ],
-        TypeEnum: [
+        Type: [
           { required: true, message: "请选择账号类型", trigger: "change" }
         ],
-        StatusEnum: [
+        Status: [
           { required: true, message: "请选择账号状态", trigger: "change" }
         ]
       },
@@ -205,13 +205,13 @@ export default {
         IdCard: "", // 身份证号码
         CompanyId: 0, // 体系Id
         Company: "", // 体系
-        TypeEnum: "", // 账号类型
-        StatusEnum: "", // 账号状态
+        Type: "", // 账号类型
+        Status: "", // 账号状态
         ProjectIds: [] // 负责项目
       },
       groupList: {
         Company: [],
-        TypeEnum: [
+        Type: [
           {
             value: 1,
             label: "公司账号"
@@ -225,7 +225,7 @@ export default {
             label: "中介用户账号"
           }
         ],
-        StatusEnum: [
+        Status: [
           { label: "启用", value: 1 },
           { label: "停用", value: 2 },
           { label: "异常", value: 3 }
@@ -260,8 +260,8 @@ export default {
       if (this.dialogFormVisible) {
         if (Object.keys(this.changData).length > 0) {
           this.dialogForm = Object.assign({}, this.dialogForm, this.changData, {
-            TypeEnum: this.changData.Type,
-            StatusEnum: this.changData.Status
+            Type: this.changData.Type,
+            Status: this.changData.Status
           });
         } else {
           this.restFrom();
@@ -280,7 +280,11 @@ export default {
               this.$emit("update:dialogFormVisible", false);
             });
           } else {
-            ModifyAccount(this.dialogForm).then(res => {
+            let setData = Object.assign({}, this.dialogForm, {
+              TypeEnum: this.dialogForm.Type,
+              StatusEnum: this.dialogForm.Status
+            });
+            ModifyAccount(setData).then(res => {
               this.$message.success("账号修改成功");
               this.$emit("getDataList");
               this.$emit("update:dialogFormVisible", false);
