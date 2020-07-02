@@ -106,7 +106,11 @@
     </div>
     <div slot="footer" class="dialog-footer" style="text-align:center">
       <el-button @click="$emit('update:dialogFormVisible', false)">取消</el-button>
-      <el-button type="primary" @click="submitForm('ruleForm')">{{ isAdd ?'确定':'修改' }}</el-button>
+      <el-button
+        type="primary"
+        :loading="sureloading"
+        @click="submitForm('ruleForm')"
+      >{{ isAdd ?'确定':'修改' }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -164,6 +168,7 @@ export default {
     };
     return {
       isAdd: true,
+      sureloading: false,
       rules: {
         UserName: [
           { required: true, message: "请输入项目名称", trigger: "blur" }
@@ -273,22 +278,33 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
+          this.sureloading = true;
           if (this.isAdd) {
-            AddAccount(this.dialogForm).then(res => {
-              this.$message.success("账号添加成功");
-              this.$emit("getDataList");
-              this.$emit("update:dialogFormVisible", false);
-            });
+            AddAccount(this.dialogForm)
+              .then(res => {
+                this.$message.success("账号添加成功");
+                this.sureloading = false;
+                this.$emit("getDataList");
+                this.$emit("update:dialogFormVisible", false);
+              })
+              .catch(() => {
+                this.sureloading = false;
+              });
           } else {
             let setData = Object.assign({}, this.dialogForm, {
               TypeEnum: this.dialogForm.Type,
               StatusEnum: this.dialogForm.Status
             });
-            ModifyAccount(setData).then(res => {
-              this.$message.success("账号修改成功");
-              this.$emit("getDataList");
-              this.$emit("update:dialogFormVisible", false);
-            });
+            ModifyAccount(setData)
+              .then(res => {
+                this.sureloading = false;
+                this.$message.success("账号修改成功");
+                this.$emit("getDataList");
+                this.$emit("update:dialogFormVisible", false);
+              })
+              .catch(() => {
+                this.sureloading = false;
+              });
           }
         }
       });

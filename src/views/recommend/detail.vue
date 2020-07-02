@@ -40,7 +40,11 @@
     </div>
     <div slot="footer" class="dialog-footer" style="text-align:center">
       <el-button @click="$emit('update:dialogFormVisible', false)">取消</el-button>
-      <el-button type="primary" @click="submitForm('ruleForm')">{{ isAdd ?'确定':'修改' }}</el-button>
+      <el-button
+        type="primary"
+        :loading="sureloading"
+        @click="submitForm('ruleForm')"
+      >{{ isAdd ?'确定':'修改' }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -61,6 +65,7 @@ export default {
   data() {
     return {
       isAdd: true,
+      sureloading: false,
       rules: {
         StatusEnum: [
           { required: true, message: "请选择账号状态", trigger: "change" }
@@ -84,6 +89,7 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(async valid => {
         if (valid) {
+          this.sureloading = true;
           let results = await Promise.all(
             this.dialogForm.Id.map(async item => {
               this.accountList.map(async data => {
@@ -106,6 +112,7 @@ export default {
       this.$message.success("推荐人新增成功");
       this.$emit("getDataList");
       this.$emit("update:dialogFormVisible", false);
+      this.sureloading = false;
     },
     getAccountList() {
       GetAccountList({

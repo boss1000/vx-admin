@@ -221,7 +221,12 @@
       <el-button @click="$emit('update:dialogFormVisible', false)">取消</el-button>
       <el-button v-if="activeName !== '0'" type="primary" @click="preFrom">上一页</el-button>
       <el-button v-if="activeName !== '2'" type="primary" @click="nextFrom">下一页</el-button>
-      <el-button v-if="activeName == '2'" type="primary" @click="nextFrom">{{ isAdd ?'确定':'修改' }}</el-button>
+      <el-button
+        v-if="activeName == '2'"
+        :loading="sureloading"
+        type="primary"
+        @click="nextFrom"
+      >{{ isAdd ?'确定':'修改' }}</el-button>
     </div>
     <MapDialog :showMap.sync="showMap" :gpsForm="GpsForm" @getMap="getMap"></MapDialog>
   </el-dialog>
@@ -274,6 +279,7 @@ export default {
     };
     return {
       isAdd: false,
+      sureloading: false,
       rules: {
         ProjectName: [
           { required: true, message: "请输入项目名称", trigger: "blur" }
@@ -386,18 +392,14 @@ export default {
       deep: true,
       immediate: true
     },
-    dialogId: {
-      handler() {
-        if (this.dialogId !== 0) {
-          this.getFetchId();
-          this.clearValidate();
-        } else {
-          this.restFrom();
-        }
-      }
-    },
     dialogFormVisible() {
       this.activeName = "0";
+      if (this.dialogFormVisible) {
+        this.getFetchId();
+        this.clearValidate();
+      } else {
+        this.restFrom();
+      }
     },
     accountList: {
       handler() {
@@ -421,27 +423,38 @@ export default {
         if (valid) {
           if (this.activeName == "2") {
             // 最后一步 确定
+            this.sureloading = true;
             if (this.isAdd) {
-              AddProject(this.dialogForm).then(res => {
-                this.$message({
-                  type: "success",
-                  message: "新增成功"
+              AddProject(this.dialogForm)
+                .then(res => {
+                  this.$message({
+                    type: "success",
+                    message: "新增成功"
+                  });
+                  this.sureloading = false;
+                  this.$emit("update:dialogFormVisible", false);
+                  this.$emit("getDataList");
+                })
+                .catch(() => {
+                  this.sureloading = false;
                 });
-                this.$emit("update:dialogFormVisible", false);
-                this.$emit("getDataList");
-              });
             } else {
               let updateForm = Object.assign({}, this.dialogForm, {
                 Id: this.dialogId
               });
-              updateEditProject(updateForm).then(res => {
-                this.$message({
-                  type: "success",
-                  message: "修改成功"
+              updateEditProject(updateForm)
+                .then(res => {
+                  this.$message({
+                    type: "success",
+                    message: "修改成功"
+                  });
+                  this.sureloading = false;
+                  this.$emit("update:dialogFormVisible", false);
+                  this.$emit("getDataList");
+                })
+                .catch(() => {
+                  this.sureloading = false;
                 });
-                this.$emit("update:dialogFormVisible", false);
-                this.$emit("getDataList");
-              });
             }
           } else {
             this.activeName = (Number(this.activeName) + 1).toString();

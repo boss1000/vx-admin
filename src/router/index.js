@@ -98,13 +98,13 @@ export const constantRoutes = [
         component: () => import("@/views/area/index"),
         name: "Account",
         meta: { title: "地区", icon: "dashboard", keepAlive: true }
+      },
+      {
+        path: "acrecommendount",
+        component: () => import("@/views/recommend/index"),
+        name: "Recommend",
+        meta: { title: "推荐人", icon: "dashboard", keepAlive: true }
       }
-      // {
-      //   path: "acrecommendount",
-      //   component: () => import("@/views/recommend/index"),
-      //   name: "Recommend",
-      //   meta: { title: "推荐人", icon: "dashboard", keepAlive: true }
-      // }
     ]
   }
 ];

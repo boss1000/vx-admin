@@ -91,7 +91,7 @@
     </div>
     <ProjectDetail
       ref="detailFrom"
-      :areaList="groupList.areaList"
+      :areaList="groupList.setAreaList"
       :accountList="groupList.AccountList"
       :dialogFormVisible.sync="dialogFormVisible"
       :title="dialogTitle"
@@ -130,6 +130,7 @@ export default {
       groupList: {
         AccountList: [],
         areaList: [],
+        setAreaList: [],
         typeList: [
           {
             text: "默认",
@@ -190,6 +191,7 @@ export default {
     },
     getAreaList() {
       GetAreaList().then(data => {
+        this.groupList.setAreaList = data.Result;
         this.groupList.areaList = [
           {
             value: null,

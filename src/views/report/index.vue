@@ -126,7 +126,7 @@
       </div>
       <div slot="footer" class="dialog-footer" style="text-align:center">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
+        <el-button type="primary" :loading="sureloading" @click="submitForm('ruleForm')">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -142,6 +142,7 @@ export default {
   },
   data() {
     return {
+      sureloading: false,
       searchForm: {
         Q: "",
         Status: "",
@@ -262,11 +263,17 @@ export default {
       });
     },
     submitForm() {
-      ChangeStatus(this.dialogForm).then(res => {
-        this.$message.success("报备状态修改成功");
-        this.dialogFormVisible = false;
-        this.getDataList();
-      });
+      this.sureloading = true;
+      ChangeStatus(this.dialogForm)
+        .then(res => {
+          this.$message.success("报备状态修改成功");
+          this.dialogFormVisible = false;
+          this.sureloading = false;
+          this.getDataList();
+        })
+        .catch(() => {
+          this.sureloading = false;
+        });
     },
     getAreaList() {
       GetAreaList().then(data => {

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    width="800px"
+    width="600px"
     :title="title"
     :visible="dialogFormVisible"
     :close-on-click-modal="false"
@@ -16,7 +16,7 @@
         label-width="100px"
       >
         <el-row>
-          <el-col :span="12">
+          <el-col :span="24">
             <el-form-item label="地区名称" prop="AreaName">
               <el-input v-model="dialogForm.AreaName" placeholder="请输入地区名称"></el-input>
             </el-form-item>
@@ -26,7 +26,11 @@
     </div>
     <div slot="footer" class="dialog-footer" style="text-align:center">
       <el-button @click="$emit('update:dialogFormVisible', false)">取消</el-button>
-      <el-button type="primary" @click="submitForm('ruleForm')">{{ isAdd ?'确定':'修改' }}</el-button>
+      <el-button
+        type="primary"
+        :loading="sureloading"
+        @click="submitForm('ruleForm')"
+      >{{ isAdd ?'确定':'修改' }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -51,6 +55,7 @@ export default {
   data() {
     return {
       isAdd: true,
+      sureloading: false,
       rules: {
         AreaName: [
           { required: true, message: "请输入地区名称", trigger: "blur" }
@@ -87,18 +92,29 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
+          this.sureloading = false;
           if (this.isAdd) {
-            AddArea(this.dialogForm).then(res => {
-              this.$message.success("地区添加成功");
-              this.$emit("getDataList");
-              this.$emit("update:dialogFormVisible", false);
-            });
+            AddArea(this.dialogForm)
+              .then(res => {
+                this.$message.success("地区添加成功");
+                this.$emit("getDataList");
+                this.sureloading = false;
+                this.$emit("update:dialogFormVisible", false);
+              })
+              .catch(() => {
+                this.sureloading = false;
+              });
           } else {
-            EditArea(this.dialogForm).then(res => {
-              this.$message.success("地区修改成功");
-              this.$emit("getDataList");
-              this.$emit("update:dialogFormVisible", false);
-            });
+            EditArea(this.dialogForm)
+              .then(res => {
+                this.$message.success("地区修改成功");
+                this.$emit("getDataList");
+                this.sureloading = false;
+                this.$emit("update:dialogFormVisible", false);
+              })
+              .catch(() => {
+                this.sureloading = false;
+              });
           }
         }
       });
