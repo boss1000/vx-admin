@@ -57,7 +57,7 @@
         <el-table
           ref="tableBox"
           v-loading="tableLoading"
-          :data="tableData.slice((searchForm.PageIndex-1)*searchForm.PageSize, searchForm.PageIndex*searchForm.PageSize)"
+          :data="tableData"
           height="100%"
           size="mini"
           stripe
@@ -348,9 +348,11 @@ export default {
     },
     handleSizeChange() {
       this.searchForm.PageSize = val;
+      this.getDataList();
     },
     handleCurrentChange(val) {
       this.searchForm.PageIndex = val;
+      this.getDataList();
     }
   }
 };

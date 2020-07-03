@@ -122,7 +122,7 @@ export default {
         Area: "",
         orderType: 1,
         PageIndex: 1,
-        PageSize: 50
+        PageSize: 20
       },
       page: {
         total: 0
