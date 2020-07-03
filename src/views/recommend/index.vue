@@ -102,7 +102,7 @@
   </div>
 </template>
 <script>
-import { GetAccountList, ModifyAccount } from "@/api/account";
+import { GetSpecialAccountList, ModifyAccount } from "@/api/account";
 import accountDetail from "./detail";
 import reportDetail from "@/components/reportDetail";
 export default {
@@ -183,7 +183,7 @@ export default {
     },
     getDataList() {
       this.tableLoading = true;
-      GetAccountList(this.searchForm).then(res => {
+      GetSpecialAccountList(this.searchForm).then(res => {
         this.tableData = res.Result;
         this.page.total = res.Result.length;
         this.tableLoading = false;
