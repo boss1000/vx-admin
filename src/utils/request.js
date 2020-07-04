@@ -103,6 +103,15 @@ service.interceptors.response.use(
           type: "error",
           duration: 5 * 1000
         });
+      } else if (error.toString().indexOf("401") > 0) {
+        Message({
+          message: "登录过期，请重新登录",
+          type: "error",
+          duration: 5 * 1000
+        });
+        setTimeout(() => {
+          store.dispatch("user/logout");
+        }, 1000);
       } else {
         Message({
           message: error.response.data,
