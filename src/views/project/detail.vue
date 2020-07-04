@@ -363,7 +363,7 @@ export default {
       dialogForm: {
         ProjectName: "", // 项目名称
         Area: null, // 地区
-        ReportCount: 0, // 报备数
+        ReportCount: "", // 报备数
         ReportMobileTypeEnum: null, // 报备手机号显示方式
         ResidenterId: "", // 项目驻场人
         ResidenterMobile: "", // 项目驻场人手机号
@@ -395,7 +395,9 @@ export default {
     dialogFormVisible() {
       this.activeName = "0";
       if (this.dialogFormVisible) {
-        this.getFetchId();
+        if (!this.isAdd) {
+          this.getFetchId();
+        }
         this.clearValidate();
       } else {
         this.restFrom();

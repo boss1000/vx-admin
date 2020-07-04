@@ -23,6 +23,29 @@ service.interceptors.request.use(
       // xhr.setRequestHeader("Authorization", "Bearer " + $.cookie("xzb_token"));
       config.headers["Authorization"] = "Bearer " + getToken();
     }
+    // 去除空字符串
+    // get请求
+    if (config.params && Object.keys(config.params).length > 0) {
+      let setParams = {};
+      for (let index in config.params) {
+        let value = config.params[index];
+        if (value !== "" && value !== null && value !== undefined) {
+          setParams[index] = value;
+        }
+      }
+      config.params = setParams;
+    }
+    // post 请求
+    if (config.data && Object.keys(config.data).length > 0) {
+      let setDatas = {};
+      for (let index in config.data) {
+        let value = config.data[index];
+        if (value !== "" && value !== null && value !== undefined) {
+          setDatas[index] = value;
+        }
+      }
+      config.data = setDatas;
+    }
     return config;
   },
   error => {
@@ -70,7 +93,7 @@ service.interceptors.response.use(
     } else {
       if (error.toString().indexOf("404") > 0) {
         Message({
-          message: '页面丢失',
+          message: "页面丢失",
           type: "error",
           duration: 5 * 1000
         });
