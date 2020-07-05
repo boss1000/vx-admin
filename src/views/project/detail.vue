@@ -2,6 +2,7 @@
   <el-dialog
     width="1300px"
     :title="title"
+    top="8vh"
     :visible="dialogFormVisible"
     :close-on-click-modal="false"
     @close="$emit('update:dialogFormVisible',false)"
@@ -26,6 +27,16 @@
               <el-col v-if="!isAdd" :span="8">
                 <el-form-item label="报备数" prop="ReportCount">
                   <el-input v-model="dialogForm.ReportCount" placeholder="请输入报备数"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col v-if="!isAdd" :span="8">
+                <el-form-item label="访问次数">
+                  <el-input v-model="dialogForm.AccessCounts" placeholder="请输入访问次数" disabled></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col v-if="!isAdd" :span="8">
+                <el-form-item label="分享次数">
+                  <el-input v-model="dialogForm.ShareCounts" placeholder="请输入分享次数" disabled></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -138,6 +149,20 @@
                       :value="item.value"
                     ></el-option>
                   </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="排序设置">
+                  <el-input v-model.number="dialogForm.AdminSort" placeholder="请输入排序设置数字"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="排序有效时间">
+                  <el-date-picker
+                    v-model="dialogForm.AdminSortExpireDate"
+                    type="datetime"
+                    placeholder="请选择排序有效时间"
+                  ></el-date-picker>
                 </el-form-item>
               </el-col>
               <el-col :span="16">
@@ -364,6 +389,8 @@ export default {
         ProjectName: "", // 项目名称
         Area: null, // 地区
         ReportCount: "", // 报备数
+        AccessCounts: "", // 访问次数
+        ShareCounts: "", // 分享次数
         ReportMobileTypeEnum: null, // 报备手机号显示方式
         ResidenterId: "", // 项目驻场人
         ResidenterMobile: "", // 项目驻场人手机号
@@ -379,7 +406,9 @@ export default {
         Detail: "", // 文字详情(富文本)
         Address: "", // 地址详情
         GPS: "", // 地址
-        IsEnableIdCard: true
+        IsEnableIdCard: true,
+        AdminSort: "", // 管理员设置的排序
+        AdminSortExpireDate: "" // 管理员设置的排序有效时间
       },
       groupList: []
     };

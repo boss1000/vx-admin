@@ -26,25 +26,33 @@ service.interceptors.request.use(
     // 去除空字符串
     // get请求
     if (config.params && Object.keys(config.params).length > 0) {
-      let setParams = {};
-      for (let index in config.params) {
-        let value = config.params[index];
-        if (value !== "" && value !== null && value !== undefined) {
-          setParams[index] = value;
+      // 判断是否为数组
+      let isArray = (Object.prototype.toString.call(config.data) === '[object Array]')
+      if (!isArray) {
+        let setParams = {};
+        for (let index in config.params) {
+          let value = config.params[index];
+          if (value !== "" && value !== null && value !== undefined) {
+            setParams[index] = value;
+          }
         }
+        config.params = setParams;
       }
-      config.params = setParams;
     }
     // post 请求
     if (config.data && Object.keys(config.data).length > 0) {
-      let setDatas = {};
-      for (let index in config.data) {
-        let value = config.data[index];
-        if (value !== "" && value !== null && value !== undefined) {
-          setDatas[index] = value;
+      // 判断是否为数组
+      let isArray = (Object.prototype.toString.call(config.data) === '[object Array]')
+      if (!isArray) {
+        let setDatas = {};
+        for (let index in config.data) {
+          let value = config.data[index];
+          if (value !== "" && value !== null && value !== undefined) {
+            setDatas[index] = value;
+          }
         }
+        config.data = setDatas;
       }
-      config.data = setDatas;
     }
     return config;
   },
