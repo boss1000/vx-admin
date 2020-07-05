@@ -549,7 +549,11 @@ export default {
       let currResidenter = this.groupList.filter(item => {
         return item.value == data;
       });
-      this.dialogForm[name] = currResidenter[0].Mobile;
+      if (currResidenter.length > 0) {
+        this.dialogForm[name] = currResidenter[0].Mobile;
+      } else {
+        this.dialogForm[name] = "";
+      }
     }
   }
 };
