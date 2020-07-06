@@ -81,7 +81,7 @@ service.interceptors.response.use(
     if (response.status !== 200) {
       return Promise.reject(new Error(response.Result || "Error"));
     } else {
-      let hasTotal = response.headers.totalcount;
+      let hasTotal = response.headers.totalCount | response.headers.totalcount;
       let setRes = null;
       if (hasTotal) {
         setRes = Object.assign({}, res, { total: Number(hasTotal) });
