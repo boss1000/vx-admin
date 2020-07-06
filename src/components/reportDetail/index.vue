@@ -134,6 +134,7 @@ export default {
         },
         { prop: "ReporterName", label: "报备人", width: "150px" },
         { prop: "ReporterMobile", label: "报备人手机号", width: "180px" },
+        { prop: "CreateTime", label: "报备时间", width: "150px" },
         { prop: "StoreName", label: "门店", width: "150px" },
         { prop: "Remark", label: "备注", width: "150px" },
         {
