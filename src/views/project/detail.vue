@@ -500,7 +500,7 @@ export default {
       UploadPhysical(formData).then(res => {
         res.Result.fileNames.forEach(item => {
           this.dialogForm.ImgUrl =
-            "http://ccreport.chuanchengfc.com" + item.replace(/\\/g, "/");
+            "http://ccreportfiles.chuanchengfc.com" + item.replace(/\\/g, "/");
         });
       });
     },
@@ -510,9 +510,11 @@ export default {
 
       if (!isJPG) {
         this.$message.error("上传头像图片只能是 JPG 格式!");
+        return false;
       }
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB!");
+        return false;
       }
       return isJPG && isLt2M;
     },

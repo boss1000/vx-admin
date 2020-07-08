@@ -6,7 +6,12 @@
         <el-button type="primary" size="small" @click="addData">新增</el-button>
         <el-button plain size="small" @click="restData">重置</el-button>
         <el-button type="danger" size="small" @click="judgeDel">删除</el-button>
-        <el-button type="primary" size="small" @click="downloadData('项目列表')">项目列表</el-button>
+        <el-button
+          type="primary"
+          size="small"
+          :loading="downloadLoading"
+          @click="downloadData('项目列表')"
+        >项目列表</el-button>
         <el-button type="primary" size="small" @click="downloadData('项目修改记录')">项目修改记录</el-button>
       </div>
     </div>
@@ -109,7 +114,8 @@ import {
   getProjectList,
   DelProject,
   ChangeSort,
-  GetAreaList
+  GetAreaList,
+  ExportProjectList
 } from "@/api/project";
 import { GetAccountList } from "@/api/account";
 import ProjectDetail from "./detail";
@@ -169,6 +175,7 @@ export default {
         // { prop: "LinkAgeRules", label: "联动规则" }
       ],
       selectTable: [],
+      downloadLoading: false,
       tableLoading: false,
       dialogFormVisible: false,
       dialogReportVisible: false,
@@ -315,20 +322,29 @@ export default {
     },
     downloadData(name) {
       let { PageIndex, PageSize, ...searchData } = this.searchForm;
-      console.log(searchData);
-      // exportExcel(searchData).then(res => {
-      //   // 处理返回的文件流
-      //   const blob = new Blob([res]);
-      //   const fileName = `${name}.xlsx`;
-      //   const elink = document.createElement("a");
-      //   elink.download = fileName;
-      //   elink.style.display = "none";
-      //   elink.href = URL.createObjectURL(blob);
-      //   document.body.appendChild(elink);
-      //   elink.click();
-      //   URL.revokeObjectURL(elink.href); // 释放URL 对象
-      //   document.body.removeChild(elink);
-      // });
+      this.downloadLoading = true;
+      ExportProjectList(searchData).then(data => {
+        // 处理返回的文件流
+        const blob = new Blob([data], {
+          type:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        });
+        const fileName = `${name}.xls`;
+        const elink = document.createElement("a");
+        elink.download = fileName;
+        elink.style.display = "none";
+        elink.href = URL.createObjectURL(blob);
+        document.body.appendChild(elink);
+
+        elink.click();
+        URL.revokeObjectURL(elink.href); // 释放URL 对象
+        document.body.removeChild(elink);
+        this.downloadLoading = false;
+        this.$message({
+          type: "success",
+          message: "开始下载"
+        });
+      });
     }
   }
 };

@@ -130,3 +130,13 @@ export function DeleteArea(data) {
     data
   })
 }
+
+// 按条件导出项目
+export function ExportProjectList(data) {
+  return request({
+    url: '/api/Project/ExportProjectList',
+    method: 'get',
+    data,
+    responseType: 'blob'
+  })
+}
