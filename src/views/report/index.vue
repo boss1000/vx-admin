@@ -5,6 +5,8 @@
         <el-button type="primary" size="small" @click="getDataList">查询</el-button>
         <!-- <el-button type="primary" size="small" @click="addData">新增</el-button> -->
         <el-button plain size="small" @click="restData">重置</el-button>
+        <el-button type="primary" size="small" @click="downloadData('项目列表')">报备列表</el-button>
+        <el-button type="primary" size="small" @click="downloadData('项目修改记录')">报备列表记录</el-button>
       </div>
     </div>
     <div class="searchForm">
@@ -354,6 +356,23 @@ export default {
     handleCurrentChange(val) {
       this.searchForm.PageIndex = val;
       this.getDataList();
+    },
+    downloadData(name) {
+      let { PageIndex, PageSize, ...searchData } = this.searchForm;
+      console.log(searchData);
+      // exportExcel(searchData).then(res => {
+      //   // 处理返回的文件流
+      //   const blob = new Blob([res]);
+      //   const fileName = `${name}.xlsx`;
+      //   const elink = document.createElement("a");
+      //   elink.download = fileName;
+      //   elink.style.display = "none";
+      //   elink.href = URL.createObjectURL(blob);
+      //   document.body.appendChild(elink);
+      //   elink.click();
+      //   URL.revokeObjectURL(elink.href); // 释放URL 对象
+      //   document.body.removeChild(elink);
+      // });
     }
   }
 };
