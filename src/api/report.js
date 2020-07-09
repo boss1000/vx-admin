@@ -44,3 +44,23 @@ export function ChangeStatus(data) {
     params: data
   })
 }
+
+// 导出查询的报备数据
+export function ExportReportList(data) {
+  return request({
+    url: '/api/Report/ExportReportList',
+    method: 'get',
+    params: data,
+    responseType: 'blob'
+  })
+}
+
+// 导出报备操作记录
+export function ExportProjectEditRecordList(data) {
+  return request({
+    url: '/api/Report/ExportReportEditRecordList',
+    method: 'get',
+    params: data,
+    responseType: 'blob'
+  })
+}

@@ -10,9 +10,8 @@
           type="primary"
           size="small"
           :loading="downloadLoading"
-          @click="downloadData('项目列表')"
-        >项目列表</el-button>
-        <el-button type="primary" size="small" @click="downloadData('项目修改记录')">项目修改记录</el-button>
+          @click="downloadProjectList"
+        >导出列表</el-button>
       </div>
     </div>
     <div class="searchForm">
@@ -80,6 +79,7 @@
               <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
               <el-button size="mini" type="primary" @click="openReport(scope.row)">报备</el-button>
               <el-button size="mini" type="danger" @click="deleteData(scope.row)">删除</el-button>
+              <!-- <el-button type="primary" size="small" @click="downloaProjectEdit(scope.row)">修改记录</el-button> -->
             </template>
           </el-table-column>
         </el-table>
@@ -115,7 +115,8 @@ import {
   DelProject,
   ChangeSort,
   GetAreaList,
-  ExportProjectList
+  ExportProjectList,
+  ExportProjectEditRecordList
 } from "@/api/project";
 import { GetAccountList } from "@/api/account";
 import ProjectDetail from "./detail";
@@ -320,7 +321,7 @@ export default {
         this.dialogReportVisible = true;
       });
     },
-    downloadData(name) {
+    downloadProjectList() {
       let { PageIndex, PageSize, ...searchData } = this.searchForm;
       this.downloadLoading = true;
       ExportProjectList(searchData).then(data => {
@@ -329,7 +330,7 @@ export default {
           type:
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         });
-        const fileName = `${name}.xls`;
+        const fileName = `项目列表.xls`;
         const elink = document.createElement("a");
         elink.download = fileName;
         elink.style.display = "none";
@@ -340,6 +341,29 @@ export default {
         URL.revokeObjectURL(elink.href); // 释放URL 对象
         document.body.removeChild(elink);
         this.downloadLoading = false;
+        this.$message({
+          type: "success",
+          message: "开始下载"
+        });
+      });
+    },
+    downloaProjectEdit(row) {
+      ExportProjectEditRecordList({ ProjectID: row.Id }).then(data => {
+        // 处理返回的文件流
+        const blob = new Blob([data], {
+          type:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        });
+        const fileName = `项目修改记录.xls`;
+        const elink = document.createElement("a");
+        elink.download = fileName;
+        elink.style.display = "none";
+        elink.href = URL.createObjectURL(blob);
+        document.body.appendChild(elink);
+
+        elink.click();
+        URL.revokeObjectURL(elink.href); // 释放URL 对象
+        document.body.removeChild(elink);
         this.$message({
           type: "success",
           message: "开始下载"

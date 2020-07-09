@@ -500,7 +500,7 @@ export default {
       UploadPhysical(formData).then(res => {
         res.Result.fileNames.forEach(item => {
           this.dialogForm.ImgUrl =
-            "http://ccreportfiles.chuanchengfc.com" + item.replace(/\\/g, "/");
+            "http://ccreport.chuanchengfc.com" + item.replace(/\\/g, "/");
         });
       });
     },

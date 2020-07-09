@@ -136,7 +136,17 @@ export function ExportProjectList(data) {
   return request({
     url: '/api/Project/ExportProjectList',
     method: 'get',
-    data,
+    params: data,
+    responseType: 'blob'
+  })
+}
+
+// 导出项目操作记录
+export function ExportProjectEditRecordList(data) {
+  return request({
+    url: '/api/Project/ExportProjectEditRecordList',
+    method: 'get',
+    params: data,
     responseType: 'blob'
   })
 }

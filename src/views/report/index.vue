@@ -5,8 +5,12 @@
         <el-button type="primary" size="small" @click="getDataList">查询</el-button>
         <!-- <el-button type="primary" size="small" @click="addData">新增</el-button> -->
         <el-button plain size="small" @click="restData">重置</el-button>
-        <el-button type="primary" size="small" @click="downloadData('项目列表')">报备列表</el-button>
-        <el-button type="primary" size="small" @click="downloadData('项目修改记录')">报备列表记录</el-button>
+        <el-button
+          type="primary"
+          size="small"
+          :loading="downloadLoading"
+          @click="downloadReportList"
+        >导出列表</el-button>
       </div>
     </div>
     <div class="searchForm">
@@ -83,6 +87,7 @@
           <el-table-column fixed="right" align="center" label="操作" width="100px">
             <template v-if="scope.row.Type !== 308" slot-scope="scope">
               <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
+              <!-- <el-button type="primary" size="small" @click="downloaReportEdit(scope.row)">修改记录</el-button> -->
             </template>
           </el-table-column>
         </el-table>
@@ -134,7 +139,12 @@
   </div>
 </template>
 <script>
-import { GetReportList, ChangeStatus } from "@/api/report";
+import {
+  GetReportList,
+  ChangeStatus,
+  ExportReportList,
+  ExportProjectEditRecordList
+} from "@/api/report";
 import { GetAreaList } from "@/api/project";
 import datepicker from "@/components/datepicker";
 export default {
@@ -357,22 +367,54 @@ export default {
       this.searchForm.PageIndex = val;
       this.getDataList();
     },
-    downloadData(name) {
+    downloadReportList() {
       let { PageIndex, PageSize, ...searchData } = this.searchForm;
-      console.log(searchData);
-      // exportExcel(searchData).then(res => {
-      //   // 处理返回的文件流
-      //   const blob = new Blob([res]);
-      //   const fileName = `${name}.xlsx`;
-      //   const elink = document.createElement("a");
-      //   elink.download = fileName;
-      //   elink.style.display = "none";
-      //   elink.href = URL.createObjectURL(blob);
-      //   document.body.appendChild(elink);
-      //   elink.click();
-      //   URL.revokeObjectURL(elink.href); // 释放URL 对象
-      //   document.body.removeChild(elink);
-      // });
+      this.downloadLoading = true;
+      ExportReportList(searchData).then(data => {
+        // 处理返回的文件流
+        const blob = new Blob([data], {
+          type:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        });
+        const fileName = `报备列表.xls`;
+        const elink = document.createElement("a");
+        elink.download = fileName;
+        elink.style.display = "none";
+        elink.href = URL.createObjectURL(blob);
+        document.body.appendChild(elink);
+
+        elink.click();
+        URL.revokeObjectURL(elink.href); // 释放URL 对象
+        document.body.removeChild(elink);
+        this.downloadLoading = false;
+        this.$message({
+          type: "success",
+          message: "开始下载"
+        });
+      });
+    },
+    downloaReportEdit() {
+      ExportProjectEditRecordList({ RReportId: row.Id }).then(data => {
+        // 处理返回的文件流
+        const blob = new Blob([data], {
+          type:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        });
+        const fileName = `报备修改记录.xls`;
+        const elink = document.createElement("a");
+        elink.download = fileName;
+        elink.style.display = "none";
+        elink.href = URL.createObjectURL(blob);
+        document.body.appendChild(elink);
+
+        elink.click();
+        URL.revokeObjectURL(elink.href); // 释放URL 对象
+        document.body.removeChild(elink);
+        this.$message({
+          type: "success",
+          message: "开始下载"
+        });
+      });
     }
   }
 };
