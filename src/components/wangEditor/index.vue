@@ -101,7 +101,7 @@ export default {
         UploadPhysical(formData).then(res => {
           res.Result.fileNames.forEach(item => {
             insert(
-              "http://ccreport.chuanchengfc.com" + item.replace(/\\/g, "/")
+              "http://ccreportfiles.chuanchengfc.com" + item.replace(/\\/g, "/")
             );
           });
         });
