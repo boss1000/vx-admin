@@ -28,7 +28,7 @@
           </el-col>
           <el-col :span="6">
             <el-form-item label="账号状态">
-              <el-select v-model="searchForm.Status" placeholder="请选择账号状态" clearable>
+              <el-select v-model="searchForm.status" placeholder="请选择账号状态" clearable>
                 <el-option
                   v-for="item in groupList.StatusList"
                   :key="item.value"
@@ -128,7 +128,7 @@ export default {
         UserName: "",
         Mobile: "",
         Store: "",
-        Status: "",
+        status: "",
         AccountType: ""
       },
       page: {

@@ -171,7 +171,8 @@ export default {
         { prop: "Discount", label: "项目优惠" },
         { prop: "Developer", label: "项目开发商", width: "150px" },
         { prop: "OpeningTime", label: "开盘时间", width: "150px" },
-        { prop: "Commission", label: "项目佣金", width: "150px" }
+        { prop: "Commission", label: "项目佣金", width: "150px" },
+        { prop: "CreateTime", label: "项目创建时间", width: "150px" }
         // { prop: "Remark", label: "特别说明" },
         // { prop: "LinkAgeRules", label: "联动规则" }
       ],
