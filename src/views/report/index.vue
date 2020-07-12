@@ -276,6 +276,7 @@ export default {
         { prop: "ReporterName", label: "报备人", width: "150px" },
         { prop: "ReporterMobile", label: "报备人手机号", width: "180px" },
         { prop: "CreateTime", label: "报备时间", width: "150px" },
+        { prop: "HourseCode", label: "房号", width: "150px" },
         { prop: "StoreName", label: "门店", width: "150px" },
         { prop: "Remark", label: "备注", width: "150px" },
         {
@@ -305,6 +306,7 @@ export default {
     handleEdit(item) {
       this.dialogForm.ReportId = item.Id;
       this.orginHourseCode = item.HourseCode;
+      this.dialogForm.HourseCode = item.HourseCode;
       this.dialogForm.Status = this.groupList.sateList
         .map(data => {
           if (data.label == item.StatusName) {
@@ -440,7 +442,7 @@ export default {
         });
       });
     },
-    downloaReportEdit() {
+    downloaReportEdit(row) {
       ExportProjectEditRecordList({ RReportId: row.Id }).then(data => {
         // 处理返回的文件流
         const blob = new Blob([data], {
