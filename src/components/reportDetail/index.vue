@@ -76,6 +76,9 @@
               ></el-option>
             </el-select>
           </el-form-item>
+          <el-form-item v-if="dialogForm.Status == 8" label="房号">
+            <el-input v-model="dialogForm.HourseCode" placeholder="请输入房号" clearable></el-input>
+          </el-form-item>
         </el-form>
       </div>
       <div slot="footer" class="dialog-footer" style="text-align:center">
@@ -182,8 +185,10 @@ export default {
       },
       dialogForm: {
         ReportId: 0,
-        Status: 0
+        Status: 0,
+        HourseCode: ""
       },
+      orginHourseCode: "",
       tableLoading: false,
       dialogFormVisible: false
     };
@@ -240,6 +245,7 @@ export default {
     },
     handleEdit(item) {
       this.dialogForm.ReportId = item.Id;
+      this.orginHourseCode = item.HourseCode;
       this.dialogForm.Status = this.groupList.sateList
         .map(data => {
           if (data.label == item.StatusName) {
@@ -252,7 +258,13 @@ export default {
       });
     },
     submitForm() {
-      ChangeStatus(this.dialogForm).then(res => {
+      let data = Object.assign({}, this.dialogForm, {
+        HourseCode:
+          this.dialogForm.Status == 8
+            ? this.dialogForm.HourseCode
+            : this.orginHourseCode
+      });
+      ChangeStatus(data).then(res => {
         this.$message.success("报备状态修改成功");
         this.dialogFormVisible = false;
         this.getDataList();

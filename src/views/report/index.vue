@@ -35,7 +35,7 @@
             <el-form-item label="状态枚举">
               <el-select v-model="searchForm.Status" placeholder="请选择地区" clearable>
                 <el-option
-                  v-for="item in groupList.sateList"
+                  v-for="item in groupList.sateAllList"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -120,7 +120,7 @@
           label-width="100px"
         >
           <el-form-item label="状态枚举">
-            <el-select v-model="dialogForm.Status" placeholder="请选择地区" clearable>
+            <el-select v-model="dialogForm.Status" placeholder="请选择状态枚举" clearable>
               <el-option
                 v-for="item in groupList.sateList"
                 :key="item.value"
@@ -128,6 +128,9 @@
                 :value="item.value"
               ></el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item v-if="dialogForm.Status == 8" label="房号">
+            <el-input v-model="dialogForm.HourseCode" placeholder="请输入房号" clearable></el-input>
           </el-form-item>
         </el-form>
       </div>
@@ -156,6 +159,7 @@ export default {
     return {
       sureloading: false,
       downloadLoading: false,
+      orginHourseCode: "",
       searchForm: {
         Q: "",
         Status: "",
@@ -168,11 +172,46 @@ export default {
       },
       dialogForm: {
         ReportId: 0,
-        Status: 0
+        Status: 0,
+        HourseCode: ""
       },
       groupList: {
         areaList: [],
         sateList: [
+          {
+            value: 1,
+            label: "界定中"
+          },
+          {
+            value: 2,
+            label: "有效推荐"
+          },
+          {
+            value: 3,
+            label: "无效推荐"
+          },
+          {
+            value: 4,
+            label: "有效带看"
+          },
+          {
+            value: 5,
+            label: "有效到访"
+          },
+          {
+            value: 6,
+            label: "认筹"
+          },
+          {
+            value: 7,
+            label: "认购"
+          },
+          {
+            value: 8,
+            label: "成交"
+          }
+        ],
+        sateAllList: [
           {
             value: null,
             label: "全部"
@@ -237,6 +276,7 @@ export default {
         { prop: "ReporterName", label: "报备人", width: "150px" },
         { prop: "ReporterMobile", label: "报备人手机号", width: "180px" },
         { prop: "CreateTime", label: "报备时间", width: "150px" },
+        { prop: "HourseCode", label: "房号", width: "150px" },
         { prop: "StoreName", label: "门店", width: "150px" },
         { prop: "Remark", label: "备注", width: "150px" },
         {
@@ -265,6 +305,8 @@ export default {
   methods: {
     handleEdit(item) {
       this.dialogForm.ReportId = item.Id;
+      this.orginHourseCode = item.HourseCode;
+      this.dialogForm.HourseCode = item.HourseCode;
       this.dialogForm.Status = this.groupList.sateList
         .map(data => {
           if (data.label == item.StatusName) {
@@ -278,7 +320,13 @@ export default {
     },
     submitForm() {
       this.sureloading = true;
-      ChangeStatus(this.dialogForm)
+      let data = Object.assign({}, this.dialogForm, {
+        HourseCode:
+          this.dialogForm.Status == 8
+            ? this.dialogForm.HourseCode
+            : this.orginHourseCode
+      });
+      ChangeStatus(data)
         .then(res => {
           this.$message.success("报备状态修改成功");
           this.dialogFormVisible = false;
