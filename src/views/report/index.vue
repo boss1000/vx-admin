@@ -84,10 +84,10 @@
               show-overflow-tooltip
             ></el-table-column>
           </template>
-          <el-table-column fixed="right" align="center" label="操作" width="100px">
+          <el-table-column fixed="right" align="center" label="操作" width="180px">
             <template v-if="scope.row.Type !== 308" slot-scope="scope">
               <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
-              <!-- <el-button type="primary" size="small" @click="downloaReportEdit(scope.row)">修改记录</el-button> -->
+              <el-button type="primary" size="small" @click="downloaReportEdit(scope.row)">修改记录</el-button>
             </template>
           </el-table-column>
         </el-table>

@@ -369,6 +369,8 @@ export default {
           type: "success",
           message: "开始下载"
         });
+      }).catch(error => {
+        console.log(error)
       });
     }
   }

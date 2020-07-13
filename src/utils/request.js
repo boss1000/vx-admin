@@ -79,7 +79,16 @@ service.interceptors.response.use(
     const res = response.data;
     // if the custom code is not 20000, it is judged as an error.
     if (response.status !== 200) {
-      return Promise.reject(new Error(response.Result || "Error"));
+      if (response.status == 204) {
+        Message({
+          message: "暂无下载数据",
+          type: "success",
+          duration: 5 * 1000
+        });
+        return Promise.reject(new Error(response.Result || "Error"));
+      } else {
+        return Promise.reject(new Error(response.Result || "Error"));
+      }
     } else {
       let hasTotal = response.headers.totalCount | response.headers.totalcount;
       let setRes = null;
