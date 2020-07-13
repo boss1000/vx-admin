@@ -74,12 +74,12 @@
               show-overflow-tooltip
             ></el-table-column>
           </template>
-          <el-table-column fixed="right" align="center" label="操作" width="250px">
+          <el-table-column fixed="right" align="center" label="操作" width="320px">
             <template slot-scope="scope">
               <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
               <el-button size="mini" type="primary" @click="openReport(scope.row)">报备</el-button>
               <el-button size="mini" type="danger" @click="deleteData(scope.row)">删除</el-button>
-              <!-- <el-button type="primary" size="small" @click="downloaProjectEdit(scope.row)">修改记录</el-button> -->
+              <el-button type="primary" size="small" @click="downloaProjectEdit(scope.row)">修改记录</el-button>
             </template>
           </el-table-column>
         </el-table>

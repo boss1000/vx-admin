@@ -155,6 +155,7 @@ export default {
   data() {
     return {
       sureloading: false,
+      downloadLoading: false,
       searchForm: {
         Q: "",
         Status: "",
@@ -393,8 +394,8 @@ export default {
         });
       });
     },
-    downloaReportEdit() {
-      ExportProjectEditRecordList({ RReportId: row.Id }).then(data => {
+    downloaReportEdit(row) {
+      ExportProjectEditRecordList({ ReportId: row.Id }).then(data => {
         // 处理返回的文件流
         const blob = new Blob([data], {
           type:
