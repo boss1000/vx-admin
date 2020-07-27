@@ -280,7 +280,10 @@ export default {
         if (valid) {
           this.sureloading = true;
           if (this.isAdd) {
-            AddAccount(this.dialogForm)
+            let setData = Object.assign({}, this.dialogForm, {
+              TypeEnum: this.dialogForm.Type
+            });
+            AddAccount(setData)
               .then(res => {
                 this.$message.success("账号添加成功");
                 this.sureloading = false;
