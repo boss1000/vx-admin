@@ -267,6 +267,7 @@ export default {
         },
         { prop: "CustomerName", label: "客户姓名", width: "150px" },
         { prop: "CustomerMobile", label: "客户手机号", width: "150px" },
+        { prop: "CustomerIdCard", label: "客户身份证号", width: "200px" },
         { prop: "ArriveDateTime", label: "预约来访时间", width: "150px" },
         {
           prop: "CompanyName",
