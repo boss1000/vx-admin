@@ -92,23 +92,23 @@
 import {
   GetReportListByUserId,
   GetReportListByProjectId,
-  ChangeStatus
+  ChangeStatus,
 } from "@/api/report";
 export default {
   name: "Project",
   props: {
     dialogReportVisible: {
       type: Boolean,
-      default: false
+      default: false,
     },
     userId: {
       type: Number,
-      default: 0
+      default: 0,
     },
     projectId: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   data() {
     return {
@@ -116,7 +116,7 @@ export default {
         UserId: 0,
         PageIndex: 1,
         PageSize: 20,
-        total: 0
+        total: 0,
       },
       tableData: [],
       tableName: [
@@ -125,7 +125,7 @@ export default {
         {
           prop: "PrincipalerMobile",
           label: "项目负责人手机号",
-          width: "150px"
+          width: "150px",
         },
         { prop: "CustomerName", label: "客户姓名", width: "150px" },
         { prop: "CustomerMobile", label: "客户手机号", width: "150px" },
@@ -133,7 +133,7 @@ export default {
         {
           prop: "CompanyName",
           label: "体系",
-          width: "150px"
+          width: "150px",
         },
         { prop: "ReporterName", label: "报备人", width: "150px" },
         { prop: "ReporterMobile", label: "报备人手机号", width: "180px" },
@@ -144,53 +144,53 @@ export default {
           prop: "StatusName",
           label: "报备状态",
           width: "150px",
-          fixed: "right"
-        }
+          fixed: "right",
+        },
       ],
       groupList: {
         sateList: [
           {
             value: 1,
-            label: "界定中"
+            label: "界定中",
           },
           {
             value: 2,
-            label: "有效推荐"
+            label: "有效推荐",
           },
           {
             value: 3,
-            label: "无效推荐"
+            label: "无效推荐",
           },
           {
             value: 4,
-            label: "有效带看"
+            label: "有效带看",
           },
           {
             value: 5,
-            label: "有效到访"
+            label: "有效到访",
           },
           {
             value: 6,
-            label: "认筹"
+            label: "认筹",
           },
           {
             value: 7,
-            label: "认购"
+            label: "认购",
           },
           {
             value: 8,
-            label: "成交"
-          }
-        ]
+            label: "成交",
+          },
+        ],
       },
       dialogForm: {
         ReportId: 0,
         Status: 0,
-        HourseCode: ""
+        HourseCode: "",
       },
       orginHourseCode: "",
       tableLoading: false,
-      dialogFormVisible: false
+      dialogFormVisible: false,
     };
   },
   watch: {
@@ -209,8 +209,8 @@ export default {
             this.getDataList();
           });
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     getDataList() {
@@ -223,23 +223,23 @@ export default {
     },
     getTableByUserId() {
       GetReportListByUserId(this.searchForm)
-        .then(data => {
+        .then((data) => {
           this.searchForm.total = data.total;
           this.tableData = data.Result;
           this.tableLoading = false;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
     getTableByProjectId() {
       GetReportListByProjectId(this.searchForm)
-        .then(data => {
+        .then((data) => {
           this.searchForm.total = data.total;
           this.tableData = data.Result;
           this.tableLoading = false;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -247,12 +247,12 @@ export default {
       this.dialogForm.ReportId = item.Id;
       this.orginHourseCode = item.HourseCode;
       this.dialogForm.Status = this.groupList.sateList
-        .map(data => {
+        .map((data) => {
           if (data.label == item.StatusName) {
             return data.value;
           }
         })
-        .filter(item => item)[0];
+        .filter((item) => item)[0];
       this.$nextTick(() => {
         this.dialogFormVisible = true;
       });
@@ -262,20 +262,23 @@ export default {
         HourseCode:
           this.dialogForm.Status == 8
             ? this.dialogForm.HourseCode
-            : this.orginHourseCode
+            : this.orginHourseCode,
       });
-      ChangeStatus(data).then(res => {
+      ChangeStatus(data).then((res) => {
         this.$message.success("报备状态修改成功");
         this.dialogFormVisible = false;
         this.getDataList();
       });
     },
-    handleSizeChange() {
+    handleSizeChange(val) {
+      this.searchForm.PageIndex = 1;
+      this.searchForm.PageSize = val;
       this.getDataList();
     },
-    handleCurrentChange() {
+    handleCurrentChange(val) {
+      this.searchForm.PageIndex = val;
       this.getDataList();
-    }
-  }
+    },
+  },
 };
 </script>

@@ -20,7 +20,7 @@
       </el-form>
     </div>
     <div class="content">
-      <div class="tableBox">
+      <div class="tableBox" style="height: calc(100vh - 320px);">
         <el-table
           ref="tableBox"
           v-loading="tableLoading"

@@ -54,7 +54,7 @@
       </el-form>
     </div>
     <div class="content">
-      <div class="tableBox">
+      <div class="tableBox" style="height: calc(100vh - 360px);">
         <el-table
           ref="tableBox"
           v-loading="tableLoading"
@@ -120,7 +120,7 @@ export default {
   name: "Account",
   components: {
     accountDetail,
-    reportDetail
+    reportDetail,
   },
   data() {
     return {
@@ -129,34 +129,34 @@ export default {
         Mobile: "",
         Store: "",
         status: "",
-        AccountType: ""
+        AccountType: "",
       },
       page: {
         total: 0,
         PageIndex: 1,
-        PageSize: 10
+        PageSize: 10,
       },
       groupList: {
         StatusList: [
           { label: "全部", value: null },
           { label: "启用", value: 1 },
           { label: "停用", value: 2 },
-          { label: "异常", value: 3 }
+          { label: "异常", value: 3 },
         ],
         AccountTypeList: [
           {
             label: "公司账户",
-            value: 1
+            value: 1,
           },
           {
             label: "项目驻场",
-            value: 2
+            value: 2,
           },
           {
             label: "中介",
-            value: 3
-          }
-        ]
+            value: 3,
+          },
+        ],
       },
       changData: {},
       title: "",
@@ -172,10 +172,10 @@ export default {
         { prop: "IdCard", label: "身份证号码" },
         { prop: "Company", label: "体系" },
         { prop: "TypeName", label: "账号类型" },
-        { prop: "StatusName", label: "账号状态", width: "100px" }
+        { prop: "StatusName", label: "账号状态", width: "100px" },
       ],
       projectList: [],
-      userId: 0
+      userId: 0,
     };
   },
   activated() {
@@ -195,7 +195,7 @@ export default {
     },
     getDataList() {
       this.tableLoading = true;
-      GetAccountList(this.searchForm).then(res => {
+      GetAccountList(this.searchForm).then((res) => {
         this.tableData = res.Result;
         this.page.total = res.Result.length;
         this.tableLoading = false;
@@ -207,18 +207,18 @@ export default {
         Area: "",
         orderType: 1,
         PageIndex: 1,
-        PageSize: 10
+        PageSize: 10,
       })
-        .then(data => {
-          this.projectList = data.Result.map(item => {
+        .then((data) => {
+          this.projectList = data.Result.map((item) => {
             return {
               value: item.Id,
-              label: item.ProjectName
+              label: item.ProjectName,
             };
           });
           this.selectTable = [];
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -237,7 +237,7 @@ export default {
       );
     },
     handleSelectionChange(data) {
-      this.selectTable = data.map(item => item.Id);
+      this.selectTable = data.map((item) => item.Id);
     },
     judgeDel() {
       if (this.selectTable.length > 0) {
@@ -245,7 +245,7 @@ export default {
       } else {
         this.$message({
           type: "warning",
-          message: "请选择需要删除的项目!"
+          message: "请选择需要删除的项目!",
         });
       }
     },
@@ -253,14 +253,14 @@ export default {
       this.$confirm("是否删除该账号?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           let delSelect = data ? [data.Id] : this.selectTable;
-          DeleteAccount(delSelect).then(res => {
+          DeleteAccount(delSelect).then((res) => {
             this.$message({
               type: "success",
-              message: "删除成功!"
+              message: "删除成功!",
             });
             this.getDataList();
           });
@@ -276,13 +276,13 @@ export default {
       this.$confirm("是否重置密码?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          ResetPassword({ Id: data.Id }).then(res => {
+          ResetPassword({ Id: data.Id }).then((res) => {
             this.$message({
               type: "success",
-              message: "重置成功!"
+              message: "重置成功!",
             });
           });
         })
@@ -299,13 +299,13 @@ export default {
         this.dialogReportVisible = true;
       });
     },
-    handleSizeChange() {
+    handleSizeChange(val) {
       this.page.PageSize = val;
     },
     handleCurrentChange(val) {
       this.page.PageIndex = val;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

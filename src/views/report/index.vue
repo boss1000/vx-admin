@@ -59,7 +59,7 @@
       </el-form>
     </div>
     <div class="content">
-      <div class="tableBox">
+      <div class="tableBox" style="height: calc(100vh - 320px);">
         <el-table
           ref="tableBox"
           v-loading="tableLoading"
@@ -146,14 +146,14 @@ import {
   GetReportList,
   ChangeStatus,
   ExportReportList,
-  ExportProjectEditRecordList
+  ExportProjectEditRecordList,
 } from "@/api/report";
 import { GetAreaList } from "@/api/project";
 import datepicker from "@/components/datepicker";
 export default {
   name: "Account",
   components: {
-    datepicker
+    datepicker,
   },
   data() {
     return {
@@ -168,87 +168,87 @@ export default {
         AreaId: "",
         PageIndex: 1,
         PageSize: 10,
-        total: 0
+        total: 0,
       },
       dialogForm: {
         ReportId: 0,
         Status: 0,
-        HourseCode: ""
+        HourseCode: "",
       },
       groupList: {
         areaList: [],
         sateList: [
           {
             value: 1,
-            label: "界定中"
+            label: "界定中",
           },
           {
             value: 2,
-            label: "有效推荐"
+            label: "有效推荐",
           },
           {
             value: 3,
-            label: "无效推荐"
+            label: "无效推荐",
           },
           {
             value: 4,
-            label: "有效带看"
+            label: "有效带看",
           },
           {
             value: 5,
-            label: "有效到访"
+            label: "有效到访",
           },
           {
             value: 6,
-            label: "认筹"
+            label: "认筹",
           },
           {
             value: 7,
-            label: "认购"
+            label: "认购",
           },
           {
             value: 8,
-            label: "成交"
-          }
+            label: "成交",
+          },
         ],
         sateAllList: [
           {
             value: null,
-            label: "全部"
+            label: "全部",
           },
           {
             value: 1,
-            label: "界定中"
+            label: "界定中",
           },
           {
             value: 2,
-            label: "有效推荐"
+            label: "有效推荐",
           },
           {
             value: 3,
-            label: "无效推荐"
+            label: "无效推荐",
           },
           {
             value: 4,
-            label: "有效带看"
+            label: "有效带看",
           },
           {
             value: 5,
-            label: "有效到访"
+            label: "有效到访",
           },
           {
             value: 6,
-            label: "认筹"
+            label: "认筹",
           },
           {
             value: 7,
-            label: "认购"
+            label: "认购",
           },
           {
             value: 8,
-            label: "成交"
-          }
-        ]
+            label: "成交",
+          },
+        ],
       },
       changData: {},
       title: "",
@@ -263,7 +263,7 @@ export default {
         {
           prop: "PrincipalerMobile",
           label: "项目负责人手机号",
-          width: "150px"
+          width: "150px",
         },
         { prop: "CustomerName", label: "客户姓名", width: "150px" },
         { prop: "CustomerMobile", label: "客户手机号", width: "150px" },
@@ -272,7 +272,7 @@ export default {
         {
           prop: "CompanyName",
           label: "体系",
-          width: "150px"
+          width: "150px",
         },
         { prop: "ReporterName", label: "报备人", width: "150px" },
         { prop: "ReporterMobile", label: "报备人手机号", width: "180px" },
@@ -284,16 +284,16 @@ export default {
           prop: "StatusName",
           label: "报备状态",
           width: "150px",
-          fixed: "right"
-        }
+          fixed: "right",
+        },
       ],
       rules: {
         Status: [
-          { required: true, message: "请选择账号类型", trigger: "change" }
-        ]
+          { required: true, message: "请选择账号类型", trigger: "change" },
+        ],
       },
       projectList: [],
-      userId: 0
+      userId: 0,
     };
   },
   activated() {
@@ -309,12 +309,12 @@ export default {
       this.orginHourseCode = item.HourseCode;
       this.dialogForm.HourseCode = item.HourseCode;
       this.dialogForm.Status = this.groupList.sateList
-        .map(data => {
+        .map((data) => {
           if (data.label == item.StatusName) {
             return data.value;
           }
         })
-        .filter(item => item)[0];
+        .filter((item) => item)[0];
       this.$nextTick(() => {
         this.dialogFormVisible = true;
       });
@@ -325,10 +325,10 @@ export default {
         HourseCode:
           this.dialogForm.Status == 8
             ? this.dialogForm.HourseCode
-            : this.orginHourseCode
+            : this.orginHourseCode,
       });
       ChangeStatus(data)
-        .then(res => {
+        .then((res) => {
           this.$message.success("报备状态修改成功");
           this.dialogFormVisible = false;
           this.sureloading = false;
@@ -339,18 +339,18 @@ export default {
         });
     },
     getAreaList() {
-      GetAreaList().then(data => {
+      GetAreaList().then((data) => {
         this.groupList.areaList = [
           {
             value: null,
-            text: "全部"
-          }
+            text: "全部",
+          },
         ].concat(data.Result);
       });
     },
     getDataList() {
       this.tableLoading = true;
-      GetReportList(this.searchForm).then(res => {
+      GetReportList(this.searchForm).then((res) => {
         this.tableData = res.Result;
         this.searchForm.total = res.total;
         this.tableLoading = false;
@@ -364,20 +364,20 @@ export default {
       );
     },
     handleSelectionChange(data) {
-      this.selectTable = data.map(item => item.Id);
+      this.selectTable = data.map((item) => item.Id);
     },
     deleteData(data) {
       this.$confirm("是否删除该账号?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           let delSelect = data ? [data.Id] : this.selectTable;
-          DeleteAccount(delSelect).then(res => {
+          DeleteAccount(delSelect).then((res) => {
             this.$message({
               type: "success",
-              message: "删除成功!"
+              message: "删除成功!",
             });
           });
         })
@@ -392,13 +392,13 @@ export default {
       this.$confirm("是否重置密码?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          ResetPassword({ Id: data.Id }).then(res => {
+          ResetPassword({ Id: data.Id }).then((res) => {
             this.$message({
               type: "success",
-              message: "重置成功!"
+              message: "重置成功!",
             });
           });
         })
@@ -409,7 +409,8 @@ export default {
           // });
         });
     },
-    handleSizeChange() {
+    handleSizeChange(val) {
+      this.searchForm.PageIndex = 1;
       this.searchForm.PageSize = val;
       this.getDataList();
     },
@@ -420,11 +421,11 @@ export default {
     downloadReportList() {
       let { PageIndex, PageSize, ...searchData } = this.searchForm;
       this.downloadLoading = true;
-      ExportReportList(searchData).then(data => {
+      ExportReportList(searchData).then((data) => {
         // 处理返回的文件流
         const blob = new Blob([data], {
           type:
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
         const fileName = `报备列表.xls`;
         const elink = document.createElement("a");
@@ -439,16 +440,16 @@ export default {
         this.downloadLoading = false;
         this.$message({
           type: "success",
-          message: "开始下载"
+          message: "开始下载",
         });
       });
     },
     downloaReportEdit(row) {
-      ExportProjectEditRecordList({ ReportId: row.Id }).then(data => {
+      ExportProjectEditRecordList({ ReportId: row.Id }).then((data) => {
         // 处理返回的文件流
         const blob = new Blob([data], {
           type:
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
         const fileName = `报备修改记录.xls`;
         const elink = document.createElement("a");
@@ -462,11 +463,11 @@ export default {
         document.body.removeChild(elink);
         this.$message({
           type: "success",
-          message: "开始下载"
+          message: "开始下载",
         });
       });
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

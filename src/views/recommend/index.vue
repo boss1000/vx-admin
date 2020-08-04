@@ -54,7 +54,7 @@
       </el-form>
     </div>
     <div class="content">
-      <div class="tableBox">
+      <div class="tableBox" style="height: calc(100vh - 360px);">
         <el-table
           ref="tableBox"
           v-loading="tableLoading"
@@ -257,7 +257,7 @@ export default {
         this.dialogReportVisible = true;
       });
     },
-    handleSizeChange() {
+    handleSizeChange(val) {
       this.page.PageSize = val;
     },
     handleCurrentChange(val) {

@@ -50,7 +50,7 @@
       </el-form>
     </div>
     <div class="content">
-      <div class="tableBox">
+      <div class="tableBox" style="height: calc(100vh - 320px);">
         <el-table
           ref="tableBox"
           v-loading="tableLoading"
@@ -59,7 +59,6 @@
           size="mini"
           stripe
           border
-          style="width: 100%"
           @selection-change="handleSelectionChange"
         >
           <el-table-column type="selection" align="center" width="55"></el-table-column>
@@ -116,7 +115,7 @@ import {
   ChangeSort,
   GetAreaList,
   ExportProjectList,
-  ExportProjectEditRecordList
+  ExportProjectEditRecordList,
 } from "@/api/project";
 import { GetAccountList } from "@/api/account";
 import ProjectDetail from "./detail";
@@ -131,10 +130,10 @@ export default {
         Area: "",
         orderType: 1,
         PageIndex: 1,
-        PageSize: 20
+        PageSize: 20,
       },
       page: {
-        total: 0
+        total: 0,
       },
       groupList: {
         AccountList: [],
@@ -143,17 +142,17 @@ export default {
         typeList: [
           {
             text: "默认",
-            value: 1
+            value: 1,
           },
           {
             text: "日期排序",
-            value: 2
+            value: 2,
           },
           {
             text: "热度",
-            value: 3
-          }
-        ]
+            value: 3,
+          },
+        ],
       },
       tableData: [],
       tableName: [
@@ -165,14 +164,14 @@ export default {
         {
           prop: "PrincipalerMobile",
           label: "项目负责人手机号",
-          width: "150px"
+          width: "150px",
         },
         { prop: "AreaName", label: "项目所在地区", width: "150px" },
         { prop: "Discount", label: "项目优惠" },
         { prop: "Developer", label: "项目开发商", width: "150px" },
         { prop: "OpeningTime", label: "开盘时间", width: "150px" },
         { prop: "Commission", label: "项目佣金", width: "150px" },
-        { prop: "CreateTime", label: "项目创建时间", width: "150px" }
+        { prop: "CreateTime", label: "项目创建时间", width: "150px" },
         // { prop: "Remark", label: "特别说明" },
         // { prop: "LinkAgeRules", label: "联动规则" }
       ],
@@ -183,7 +182,7 @@ export default {
       dialogReportVisible: false,
       dialogTitle: "",
       dialogId: 0,
-      reportId: 0
+      reportId: 0,
     };
   },
   mounted() {
@@ -201,24 +200,24 @@ export default {
       });
     },
     getAreaList() {
-      GetAreaList().then(data => {
+      GetAreaList().then((data) => {
         this.groupList.setAreaList = data.Result;
         this.groupList.areaList = [
           {
             value: null,
-            text: "全部"
-          }
+            text: "全部",
+          },
         ].concat(data.Result);
       });
     },
     getDataList() {
       this.tableLoading = true;
       getProjectList(this.searchForm)
-        .then(data => {
+        .then((data) => {
           this.page.total = data.total;
 
-          this.tableData = data.Result.map(item => {
-            this.groupList.areaList.find(data => {
+          this.tableData = data.Result.map((item) => {
+            this.groupList.areaList.find((data) => {
               if (data.value == item.Area) {
                 item["AreaName"] = data.text;
                 return true;
@@ -233,7 +232,7 @@ export default {
           // this.tableData = data.Result;
           this.tableLoading = false;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -243,8 +242,8 @@ export default {
         Mobile: "",
         Store: "",
         Status: "",
-        AccountType: ""
-      }).then(res => {
+        AccountType: "",
+      }).then((res) => {
         this.groupList.AccountList = res.Result;
       });
     },
@@ -261,14 +260,17 @@ export default {
       this.dialogId = data.Id;
       this.dialogFormVisible = true;
     },
-    handleSizeChange() {
+    handleSizeChange(val) {
+      this.searchForm.PageIndex = 1;
+      this.searchForm.PageSize = val;
       this.getDataList();
     },
-    handleCurrentChange() {
+    handleCurrentChange(val) {
+      this.searchForm.PageIndex = val;
       this.getDataList();
     },
     handleSelectionChange(data) {
-      this.selectTable = data.map(item => item.Id);
+      this.selectTable = data.map((item) => item.Id);
     },
     restData() {
       this.searchForm = Object.assign(
@@ -283,7 +285,7 @@ export default {
       } else {
         this.$message({
           type: "warning",
-          message: "请选择需要删除的项目!"
+          message: "请选择需要删除的项目!",
         });
       }
     },
@@ -291,15 +293,15 @@ export default {
       this.$confirm("是否删除该项目?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           let delSelect = data ? [data.Id] : this.selectTable;
-          DelProject(delSelect).then(res => {
+          DelProject(delSelect).then((res) => {
             this.getDataList();
             this.$message({
               type: "success",
-              message: "删除成功!"
+              message: "删除成功!",
             });
           });
         })
@@ -325,11 +327,11 @@ export default {
     downloadProjectList() {
       let { PageIndex, PageSize, ...searchData } = this.searchForm;
       this.downloadLoading = true;
-      ExportProjectList(searchData).then(data => {
+      ExportProjectList(searchData).then((data) => {
         // 处理返回的文件流
         const blob = new Blob([data], {
           type:
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
         const fileName = `项目列表.xls`;
         const elink = document.createElement("a");
@@ -344,36 +346,38 @@ export default {
         this.downloadLoading = false;
         this.$message({
           type: "success",
-          message: "开始下载"
+          message: "开始下载",
         });
       });
     },
     downloaProjectEdit(row) {
-      ExportProjectEditRecordList({ ProjectID: row.Id }).then(data => {
-        // 处理返回的文件流
-        const blob = new Blob([data], {
-          type:
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        });
-        const fileName = `项目修改记录.xls`;
-        const elink = document.createElement("a");
-        elink.download = fileName;
-        elink.style.display = "none";
-        elink.href = URL.createObjectURL(blob);
-        document.body.appendChild(elink);
+      ExportProjectEditRecordList({ ProjectID: row.Id })
+        .then((data) => {
+          // 处理返回的文件流
+          const blob = new Blob([data], {
+            type:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          });
+          const fileName = `项目修改记录.xls`;
+          const elink = document.createElement("a");
+          elink.download = fileName;
+          elink.style.display = "none";
+          elink.href = URL.createObjectURL(blob);
+          document.body.appendChild(elink);
 
-        elink.click();
-        URL.revokeObjectURL(elink.href); // 释放URL 对象
-        document.body.removeChild(elink);
-        this.$message({
-          type: "success",
-          message: "开始下载"
+          elink.click();
+          URL.revokeObjectURL(elink.href); // 释放URL 对象
+          document.body.removeChild(elink);
+          this.$message({
+            type: "success",
+            message: "开始下载",
+          });
+        })
+        .catch((error) => {
+          console.log(error);
         });
-      }).catch(error => {
-        console.log(error)
-      });
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss">
