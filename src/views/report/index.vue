@@ -280,6 +280,8 @@ export default {
         { prop: "HourseCode", label: "房号", width: "150px" },
         { prop: "StoreName", label: "门店", width: "150px" },
         { prop: "Remark", label: "备注", width: "150px" },
+        { prop: "ReportUserName", label: "报备账号", width: "150px" },
+        { prop: "ReportMobile", label: "报备账号手机", width: "150px" },
         {
           prop: "StatusName",
           label: "报备状态",
